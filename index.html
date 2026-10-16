@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GAMBLLEEEEEEEEEEEE</title>
+<title>Matthew's Cool Gamble Project</title>
 <style>
   :root {
     --felt: #0f3d2e;
@@ -15,6 +15,8 @@
     --muted: #9fb8ad;
     --cheat: #ff6666;
   }
+  /* Hey!!! If you're looking in the code and or Inspect Element (for whatever reason)
+  then just to let you know you're not finding anything interesting here lmao*/
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100%; }
   body {
@@ -27,7 +29,6 @@
   button { font: inherit; cursor: pointer; }
   button:focus-visible, input:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
 
-  /* top bar */
   header {
     display: flex; align-items: center; justify-content: space-between;
     gap: 12px; padding: 12px 16px; flex-wrap: wrap;
@@ -59,7 +60,6 @@
   .sub { text-align: center; color: var(--muted); margin: 0 0 22px; }
   [hidden] { display: none !important; }
 
-  /* chips */
   .chipbar { display: flex; justify-content: center; margin-bottom: 18px; }
   .chipcount {
     display: inline-flex; align-items: center; gap: 12px;
@@ -73,7 +73,6 @@
     box-shadow: 0 0 0 2px var(--ruby);
   }
 
-  /* machine */
   .machine {
     background: linear-gradient(#7a1a20, #5a1217);
     border: 6px solid var(--brass); border-radius: 22px;
@@ -119,14 +118,12 @@
   .paytable { margin-top: 22px; color: var(--muted); font-size: .9rem; text-align: center; line-height: 1.7; }
   .paytable b { color: var(--ivory); }
 
-  /* refill lock */
   .lock {
     margin-top: 16px; text-align: center; background: rgba(0,0,0,.35);
     border: 2px solid var(--ruby); border-radius: 12px; padding: 14px;
   }
   .lock .timer { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--brass); }
 
-  /* auth */
   .card {
     max-width: 420px; margin: 20px auto 0; background: rgba(0,0,0,.3);
     border: 2px solid rgba(216,169,75,.5); border-radius: 16px; padding: 22px;
@@ -156,7 +153,6 @@
     background: rgba(179,38,46,.3); border: 2px solid var(--cheat); border-radius: 12px; color: var(--ivory);
   }
 
-  /* leaderboard */
   table { width: 100%; border-collapse: collapse; background: rgba(0,0,0,.28); border-radius: 12px; overflow: hidden; }
   th, td { padding: 12px 14px; text-align: left; }
   th { background: rgba(216,169,75,.22); color: var(--brass); }
@@ -195,7 +191,6 @@
   .creditstext { text-align: center; color: var(--ivory); margin: 16px 0 0; line-height: 1.5; white-space: pre-line; }
   .empty { text-align: center; color: var(--muted); padding: 24px; }
 
-  /* games menu */
   .gamegrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
   .gamecard {
     display: flex; flex-direction: column; align-items: center; gap: 6px;
@@ -207,7 +202,6 @@
   .gamename { font-family: Rockwell, "Roboto Slab", Georgia, serif; font-size: 1.5rem; font-weight: 800; color: var(--brass); }
   .gamedesc { color: var(--muted); font-size: .9rem; }
 
-  /* roulette */
   .wheelwrap { position: relative; width: min(300px, 78vw); aspect-ratio: 1; margin: 10px auto 18px; }
   .wheelpointer {
     position: absolute; top: -10px; left: 50%; transform: translateX(-50%); z-index: 3;
@@ -248,7 +242,6 @@
   .rgrid button.sel { box-shadow: 0 0 0 3px var(--brass); transform: scale(1.12); position: relative; z-index: 1; }
   .rgroup button:disabled, .rgrid button:disabled { opacity: .5; cursor: not-allowed; }
 
-  /* admin panel */
   .notifier {
     background: rgba(0,0,0,.28); border: 2px solid rgba(216,169,75,.5);
     border-radius: 16px; padding: 18px;
@@ -275,6 +268,33 @@
   .pill.bad { border-color: var(--cheat); color: var(--cheat); }
   .pill.new { background: var(--brass); color: var(--ink); }
   #viewPanel { padding-bottom: 90px; }
+  .panelgap { margin-top: 16px; }
+  .notifier .tabs { flex-wrap: wrap; }
+  .notifier .tabs button { flex: 1 1 auto; padding: 8px 10px; font-size: .9rem; white-space: nowrap; }
+  .pill.win { border-color: #f3d27a; color: #f3d27a; background: rgba(243,210,122,.12); }
+  .pill.warn { border-color: #e0a040; color: #f3d9a4; }
+  .pill.admin { border-color: #8fb4ff; color: #b9d0ff; }
+  .ovgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+  .ovtile { background: rgba(0,0,0,.3); border: 1px solid rgba(216,169,75,.4); border-radius: 12px; padding: 10px 8px; text-align: center; }
+  .ovnum { font-size: 1.4rem; font-weight: 800; color: var(--brass); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .ovlabel { font-size: .8rem; color: var(--muted); }
+  textarea {
+    width: 100%; padding: 11px; font: inherit; border-radius: 8px; resize: vertical;
+    border: 2px solid transparent; background: var(--ivory); color: var(--ink);
+  }
+  .toolrow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .toolrow button {
+    border: 2px solid var(--brass); background: var(--felt-deep); color: var(--ivory);
+    border-radius: 8px; padding: 7px 14px; font-weight: 700;
+  }
+  .toolrow button:hover { background: rgba(216,169,75,.25); }
+  .announce {
+    margin: 0 0 18px; padding: 12px 16px; text-align: center; font-weight: 700; white-space: pre-line;
+    background: rgba(216,169,75,.18); border: 2px solid var(--brass); border-radius: 12px;
+  }
+  .susptag { color: #f3d9a4; font-weight: 800; margin-left: 6px; }
+  .admincell button.susp { border-color: #8fb4ff; color: #b9d0ff; }
+  .admincell button.susp:hover { background: #2a4a8a; color: var(--ivory); }
   .panelfoot {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 14px 16px;
     display: flex; justify-content: center; pointer-events: none;
@@ -288,7 +308,6 @@
   .dashbtn:hover { filter: brightness(1.08); }
   .dashbtn:focus-visible { outline: 3px solid var(--ivory); outline-offset: 2px; }
 
-  /* stats modal */
   .modal {
     position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
     background: rgba(0,0,0,.6); padding: 16px;
@@ -322,7 +341,8 @@
 </header>
 
 <main>
-  <!-- AUTH -->
+  <div class="announce" id="announce" role="status" hidden></div>
+
   <section id="viewAuth" hidden>
     <h1>Slots (soon more to come)</h1>
     <p class="sub">hi</p>
@@ -349,7 +369,6 @@
     </div>
   </section>
 
-  <!-- SLOTS -->
   <section id="viewSlots" hidden>
     <h1>Slots</h1>
     <p class="sub">(These are fake chips)</p>
@@ -379,11 +398,10 @@
     </div>
   </section>
 
-  <!-- GAMES -->
   <section id="viewGames" hidden>
     <h1>Games</h1>
     <p class="sub">Pick a game, any game...,.,.,...,.,</p>
-    <!-- To add a game later: copy one of the cards below and point it at the new game. -->
+
     <div class="gamegrid">
       <button class="gamecard" id="gameSlots">
         <span class="gameicon">🤯</span>
@@ -398,7 +416,6 @@
     </div>
   </section>
 
-  <!-- ROULETTE -->
   <section id="viewRoulette" hidden>
     <h1>Roulette</h1>
     <p class="sub">(These are fake chips)</p>
@@ -432,18 +449,16 @@
     </div>
   </section>
 
-  <!-- CREDITS -->
   <section id="viewCredits" hidden>
     <h1>Credits</h1>
     <div class="videowrap">
       <video id="creditsVideo" src="gamblecore.mp4" controls playsinline preload="metadata"></video>
       <div class="videoerr" id="videoErr" hidden>No way this retard forgot to put the gamblecore.mp4 video in the same folder as the .HTML 🤣🤣🤣</div>
-      <!-- Write your credits text below. Press Enter for new lines. -->
+
       <p class="creditstext">No, this "Ad" did not make this game, Matthew did.</p>
     </div>
   </section>
 
-  <!-- LEADERBOARD -->
   <section id="viewBoard" hidden>
     <h1>Leaderboard</h1>
     <p class="sub">Current and most chips shown for everybody.</p>
@@ -458,11 +473,35 @@
     </table>
   </section>
 
-  <!-- ADMIN PANEL -->
   <section id="viewPanel" hidden>
     <h1>Panel</h1>
     <p class="sub">People who are logged into this account SHOULD be the only ones seing this.</p>
+    <div class="toast" id="panelToast" role="status"></div>
+
     <div class="notifier">
+      <div class="notifhead"><h2>Overview</h2></div>
+      <div class="ovgrid" id="ovGrid"></div>
+    </div>
+
+    <div class="notifier panelgap">
+      <div class="notifhead"><h2>Announcement</h2></div>
+      <div class="note" style="margin:0 0 8px">Shows as a banner at the top of the game for everybody, even people who aren't logged in. Leave it empty to hide it.</div>
+      <textarea id="annText" rows="2" maxlength="200" placeholder="Write a message for everybody..."></textarea>
+      <div class="toolrow">
+        <button id="annPost">Post announcement</button>
+        <button id="annClear">Clear it</button>
+      </div>
+    </div>
+
+    <div class="notifier panelgap">
+      <div class="notifhead"><h2>Tools</h2></div>
+      <div class="note" style="margin:0 0 4px">Suspend, add/remove chips, pardon, flag and delete are on the Leaderboard tab next to each player.</div>
+      <div class="toolrow">
+        <button id="toolPurge">Clean up old test accounts</button>
+      </div>
+    </div>
+
+    <div class="notifier panelgap">
       <div class="notifhead">
         <h2>Notifier</h2>
         <span class="notifstamp" id="notifStamp"></span>
@@ -470,6 +509,10 @@
       <div class="tabs" role="tablist">
         <button id="tabAccounts" class="active" role="tab">New accounts</button>
         <button id="tabCheats" role="tab">Who cheated</button>
+        <button id="tabWins" role="tab">Big wins</button>
+        <button id="tabAlerts" role="tab">Alerts</button>
+        <button id="tabLog" role="tab">Admin log</button>
+        <button id="tabSus" role="tab">Suspicious</button>
       </div>
       <ul class="feed" id="feed"></ul>
     </div>
@@ -492,17 +535,14 @@
 (function () {
   "use strict";
 
-  /* ---------- Supabase connection ---------- */
   var SUPABASE_URL = "https://roaqfrcbcwwloohrjjzm.supabase.co";
   var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvYXFmcmNiY3d3bG9vaHJqanptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMjIwNzEsImV4cCI6MjEwNzY5ODA3MX0.4NkP7UdaRm6SSUU-wC9DkpHY7RtjU50bKfoJLYrWZJY";
-  // Supabase logins need an email, so each username is turned into a made-up one.
-  // Nobody ever sees it and no email is ever sent.
+
   var EMAIL_DOMAIN = "luckyslots.game";
 
   var sb = null;
   try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch (e) { sb = null; }
 
-  /* ---------- constants ---------- */
   var SNAP_KEY = "luckyslots_snap_v1";
   var NOTICE_KEY = "luckyslots_notice_v1";
   var SIG_SECRET = "ls-9f3a71c2-b8d4-4e07";
@@ -511,25 +551,20 @@
 
   var $ = function (id) { return document.getElementById(id); };
 
-  /* ---------- state ---------- */
-  var profile = null;      // my account row from the server, or null when logged out
+  var profile = null;
   var bet = 10;
   var spinning = false;
-  var shownChips = null;   // chip count displayed while reels are spinning
+  var shownChips = null;
   var timerHandle = null;
   var boardTimer = null;
   var viewNow = "viewAuth";
   var lastRefillTry = 0;
   var busy = false;
-  var guardObs = null;     // watches the page for outside edits
-  var tampering = false;   // true once a tamper has been caught
+  var guardObs = null;
+  var tampering = false;
 
   var isAdmin = function () { return !!(profile && profile.is_admin); };
 
-  /*
-    Meant to scare off anybody who tries modifying the code
-    using Inspect Element.
-  */
   function H(fn) {
     return function () {
       try { return fn.apply(this, arguments); }
@@ -539,7 +574,7 @@
   function on(el, ev, fn) { el.addEventListener(ev, H(fn)); }
   function later(fn, ms) { return setTimeout(H(fn), ms); }
   function every(fn, ms) { return setInterval(H(fn), ms); }
-  // Wraps a promise so that every callback attached to it also runs through H().
+
   function guarded(p) {
     return {
       then: function (a, b) { return guarded(p.then(a && H(a), b && H(b))); },
@@ -547,7 +582,6 @@
     };
   }
 
-  /* ---------- small helpers ---------- */
   function num(x) { x = Number(x); return isFinite(x) ? x : 0; }
   function load(key, fallback) {
     try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -579,7 +613,6 @@
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
   }
 
-  /* ---------- FAKE anti-cheat ---------- */
   function snapSig(p) {
     var f = [p.id, p.username, p.chips, p.peak, p.refill_at || 0, p.pairs, p.jackpots, p.losses,
              p.spent, p.cheats, p.cheater_until || 0, p.is_admin ? 1 : 0, p.show_on_board ? 1 : 0,
@@ -594,7 +627,7 @@
   function setProfile(p) { profile = p; saveSnap(); }
 
   function caught(kind) {
-    if (tampering || !profile || isAdmin()) return;   // admins are exempt
+    if (tampering || !profile || isAdmin()) return;
     tampering = true;
     if (guardObs) guardObs.disconnect();
     stopTimer();
@@ -611,8 +644,8 @@
   function integrityTick() {
     if (tampering || !profile || isAdmin()) return;
     var s = load(SNAP_KEY, null);
-    if (!s) { forceLogout(""); return; }               // saved data was removed
-    if (!snapOk(s)) caught("storage");                  // saved data was edited
+    if (!s) { forceLogout(""); return; }
+    if (!snapOk(s)) caught("storage");
   }
 
   function showNotice() {
@@ -632,8 +665,8 @@
       var outside = records.some(function (r) {
         if (r.type !== "attributes") return true;
         var a = r.attributeName || "";
-        if (a.indexOf("data-") === 0) return false;                       // markers added by extensions
-        if (r.target.tagName === "INPUT" && a === "style") return false;  // password-manager icons
+        if (a.indexOf("data-") === 0) return false;
+        if (r.target.tagName === "INPUT" && a === "style") return false;
         return true;
       });
       if (outside) caught("page");
@@ -647,7 +680,6 @@
     every(integrityTick, 1000);
   }
 
-  /* ---------- server calls ---------- */
   function rpc(name, args) {
     return guarded(sb.rpc(name, args || {}).then(function (r) {
       if (r.error) throw new Error(r.error.message || "Server error");
@@ -672,7 +704,7 @@
       return profile;
     }).catch(function () { return profile; });
   }
-  // Re-reads account; if it vanished (an admin removed it), log out.
+
   function syncMe() {
     var was = !!profile;
     return refreshMe().then(function (p) {
@@ -681,7 +713,6 @@
     });
   }
 
-  /* ---------- views ---------- */
   function show(view) {
     if (view === "viewPanel" && !isAdmin()) view = profile ? "viewSlots" : "viewAuth";
     if ((view === "viewGames" || view === "viewRoulette") && !profile) view = "viewAuth";
@@ -705,7 +736,7 @@
     if (view === "viewRoulette") renderRoulette();
     if (view === "viewBoard") {
       renderBoard();
-      // Keep it fresh for everyone watching (admins skip this so typed amounts aren't wiped).
+
       boardTimer = every(function () { if (viewNow === "viewBoard" && !isAdmin()) renderBoard(); }, 10000);
     }
     if (view === "viewPanel") openPanel();
@@ -720,33 +751,54 @@
   on($("gameRoulette"), "click", function () { show("viewRoulette"); });
   on($("creditsVideo"), "error", function () { $("videoErr").hidden = false; });
 
-  /* ---------- admin panel: notifier ---------- */
   var PANEL_SEEN_KEY = "luckyslots_panelseen_v1";
   var panelTab = "accounts";
   var panelTimer = null;
-  var panelSeen = 0;   // events newer than this get a NEW tag (the last time the Panel was opened)
+  var panelSeen = 0;
   var CHEAT_WHY = {
     page: "Edited the page in Inspect Element",
     storage: "Edited the saved game data",
-    admin: "Flagged by an admin"
+    admin: "Flagged by an admin",
+    bot: "Sent spins faster than the game allows (bot or script)"
   };
+  var PANEL_TABS = { accounts: "tabAccounts", cheats: "tabCheats", wins: "tabWins", alerts: "tabAlerts", log: "tabLog", sus: "tabSus" };
+  var EMPTY_MSG = {
+    accounts: "No new accounts yet.",
+    cheats: "Nobody has cheated yet.",
+    wins: "No big wins yet (1,000+ chips in one spin).",
+    alerts: "No alerts. All quiet.",
+    log: "You haven't done any admin actions yet.",
+    sus: "Nobody looks suspicious right now."
+  };
+  var OV_TILES = [["players", "Players"], ["tests", "Test accounts"], ["chips", "Chips in play"], ["out_of_chips", "Out of chips"],
+                  ["flagged", "Flagged cheaters"], ["suspended", "Suspended"], ["new_24h", "New accounts today"],
+                  ["cheats_24h", "Cheats today"], ["jackpots", "Jackpots won"], ["spent", "Chips spent"]];
 
   on($("navPanel"), "click", function () {
     syncMe().then(function () { if (isAdmin()) show("viewPanel"); });
   });
   function setPanelTab(t) {
     panelTab = t;
-    $("tabAccounts").classList.toggle("active", t === "accounts");
-    $("tabCheats").classList.toggle("active", t === "cheats");
+    Object.keys(PANEL_TABS).forEach(function (k) { $(PANEL_TABS[k]).classList.toggle("active", k === t); });
     renderPanel();
   }
-  on($("tabAccounts"), "click", function () { setPanelTab("accounts"); });
-  on($("tabCheats"), "click", function () { setPanelTab("cheats"); });
+  Object.keys(PANEL_TABS).forEach(function (k) {
+    on($(PANEL_TABS[k]), "click", function () { setPanelTab(k); });
+  });
+
+  var ptoastHandle = null;
+  function ptoast(t) {
+    var el = $("panelToast");
+    el.textContent = t;
+    if (ptoastHandle) clearTimeout(ptoastHandle);
+    ptoastHandle = later(function () { el.textContent = ""; }, 3500);
+  }
 
   function openPanel() {
     panelSeen = num(load(PANEL_SEEN_KEY, 0));
     save(PANEL_SEEN_KEY, Date.now());
     renderPanel();
+    rpc("get_announcement").then(function (t) { $("annText").value = (typeof t === "string") ? t : ""; }).catch(function () {});
     panelTimer = every(function () { if (viewNow === "viewPanel") renderPanel(); }, 5000);
   }
   function feedMsg(text) {
@@ -757,25 +809,50 @@
     li.textContent = text;
     feed.appendChild(li);
   }
+
+  function tile(label, value) {
+    var t = document.createElement("div");
+    t.className = "ovtile";
+    var n = document.createElement("div");
+    n.className = "ovnum"; n.textContent = value;
+    var l = document.createElement("div");
+    l.className = "ovlabel"; l.textContent = label;
+    t.appendChild(n); t.appendChild(l);
+    return t;
+  }
+  function renderOverview() {
+    rpc("admin_overview").then(function (o) {
+      if (viewNow !== "viewPanel" || !o) return;
+      var g = $("ovGrid");
+      g.textContent = "";
+      OV_TILES.forEach(function (row) { g.appendChild(tile(row[1], num(o[row[0]]).toLocaleString())); });
+      if (o.top && o.top.username) g.appendChild(tile("Richest player", o.top.username + " (" + num(o.top.chips).toLocaleString() + ")"));
+    }).catch(function () {
+      if (viewNow !== "viewPanel") return;
+      $("ovGrid").textContent = "Couldn't load the overview. Did you run admin_upgrade.sql in Supabase?";
+    });
+  }
+
   function renderPanel() {
     if (!isAdmin() || !sb) return;
     var tabNow = panelTab;
-    rpc("admin_get_events", { p_kind: tabNow, p_limit: 100 }).then(function (rows) {
+    renderOverview();
+    var job = (tabNow === "sus")
+      ? rpc("admin_suspicious")
+      : rpc("admin_get_events", { p_kind: tabNow, p_limit: 100 });
+    job.then(function (rows) {
       if (viewNow !== "viewPanel" || panelTab !== tabNow) return;
-      drawFeed(rows || [], tabNow);
+      if (tabNow === "sus") drawSus(rows || []); else drawFeed(rows || [], tabNow);
       $("notifStamp").textContent = "Updated " + new Date().toLocaleTimeString();
     }).catch(function () {
       if (viewNow !== "viewPanel") return;
-      feedMsg("Couldn't load the notifier. Did you run the new SQL in Supabase?");
+      feedMsg("Couldn't load the notifier. Did you run admin_upgrade.sql in Supabase?");
     });
   }
   function drawFeed(rows, kind) {
     var feed = $("feed");
     feed.textContent = "";
-    if (!rows.length) {
-      feedMsg(kind === "cheats" ? "Nobody has cheated yet." : "No new accounts yet.");
-      return;
-    }
+    if (!rows.length) { feedMsg(EMPTY_MSG[kind] || "Nothing here yet."); return; }
     rows.forEach(function (r) {
       var when = Date.parse(r.created_at);
       var fresh = isFinite(when) && when > panelSeen;
@@ -787,6 +864,12 @@
       left.appendChild(name);
       var pill = document.createElement("span");
       if (kind === "cheats") { pill.className = "pill bad"; pill.textContent = "CHEATED"; }
+      else if (kind === "wins") { pill.className = "pill win"; pill.textContent = "BIG WIN"; }
+      else if (kind === "alerts") {
+        if (r.kind === "broke") { pill.className = "pill warn"; pill.textContent = "OUT OF CHIPS"; }
+        else { pill.className = "pill bad"; pill.textContent = "TOO FAST"; }
+      }
+      else if (kind === "log") { pill.className = "pill admin"; pill.textContent = "ADMIN"; }
       else if (r.kind === "test_signup") { pill.className = "pill test"; pill.textContent = "TEST ACCOUNT"; }
       else { pill.className = "pill"; pill.textContent = "NEW ACCOUNT"; }
       left.appendChild(pill);
@@ -795,10 +878,13 @@
         nw.className = "pill new"; nw.textContent = "NEW";
         left.appendChild(nw);
       }
-      if (kind === "cheats") {
+      var detail = "";
+      if (kind === "cheats") detail = CHEAT_WHY[r.detail] || "Tamper detected";
+      else if (kind === "wins" || kind === "alerts" || kind === "log") detail = r.detail || "";
+      if (detail) {
         var why = document.createElement("div");
         why.className = "feedwhy";
-        why.textContent = CHEAT_WHY[r.detail] || "Tamper detected";
+        why.textContent = detail;
         left.appendChild(why);
       }
       var right = document.createElement("time");
@@ -808,12 +894,70 @@
       feed.appendChild(li);
     });
   }
+  function drawSus(rows) {
+    var feed = $("feed");
+    feed.textContent = "";
+    if (!rows.length) { feedMsg(EMPTY_MSG.sus); return; }
+    rows.forEach(function (r) {
+      var li = document.createElement("li");
+      li.className = "feeditem";
+      var left = document.createElement("div");
+      var name = document.createElement("span");
+      name.className = "feedname"; name.textContent = r.username;
+      var pill = document.createElement("span");
+      pill.className = "pill warn"; pill.textContent = "TAKE A LOOK";
+      left.appendChild(name); left.appendChild(pill);
+      var why = document.createElement("div");
+      why.className = "feedwhy"; why.textContent = r.reason || "";
+      left.appendChild(why);
+      var right = document.createElement("div");
+      right.className = "feedtime";
+      right.textContent = num(r.spins).toLocaleString() + " spins · " + num(r.jackpots).toLocaleString() + " jackpots (" + num(r.jackpot_pct) + "%) · "
+        + num(r.chips).toLocaleString() + " chips · best " + num(r.peak).toLocaleString();
+      li.appendChild(left); li.appendChild(right);
+      feed.appendChild(li);
+    });
+  }
 
-  /* ---------- header: stats + who ---------- */
+  function fetchAnnouncement() {
+    if (!sb) return;
+    rpc("get_announcement").then(function (t) {
+      var txt = (typeof t === "string") ? t.trim() : "";
+      var el = $("announce");
+      el.textContent = txt;
+      el.hidden = !txt;
+    }).catch(function () {});
+  }
+  function setAnnouncement(text, doneText) {
+    if (!isAdmin()) return;
+    rpc("admin_set_announcement", { p_text: text }).then(function () {
+      ptoast(doneText);
+      fetchAnnouncement();
+    }).catch(function (e) {
+      ptoast(/not_admin/.test(e.message || "") ? "Only the admin can do that." : "That didn't go through. Did you run admin_upgrade.sql?");
+    });
+  }
+  on($("annPost"), "click", function () {
+    var t = $("annText").value.trim();
+    if (!t) { ptoast("Type a message first, or use \"Clear it\"."); return; }
+    setAnnouncement(t, "Announcement posted.");
+  });
+  on($("annClear"), "click", function () {
+    $("annText").value = "";
+    setAnnouncement("", "Announcement cleared.");
+  });
+  on($("toolPurge"), "click", function () {
+    if (!isAdmin()) return;
+    rpc("admin_purge_tests").then(function (n) {
+      ptoast("Removed " + num(n) + " old test account" + (num(n) === 1 ? "" : "s") + ".");
+      renderPanel();
+    }).catch(function () { ptoast("That didn't go through. Did you run admin_upgrade.sql?"); });
+  });
+
   function renderWho() {
     var w = $("who");
     w.textContent = "";
-    $("navPanel").hidden = !isAdmin();   // the Panel tab only exists for the admin
+    $("navPanel").hidden = !isAdmin();
     if (profile) {
       var gm = document.createElement("button");
       gm.className = "statsbtn"; gm.textContent = "Games";
@@ -858,7 +1002,6 @@
     if (e.key === "Escape" && !$("statsModal").hidden) closeStats();
   }));
 
-  /* ---------- auth ---------- */
   var mode = "login";
   function isTestName(name) { return /^TESTACCOUNT\d{1,10}$/i.test(name); }
   function emailFor(name) { return name.toLowerCase() + "@" + EMAIL_DOMAIN; }
@@ -893,7 +1036,6 @@
     err("");
     var job;
 
-    // Throwaway test accounts: no password, hidden from the board, deleted on log out.
     if (isTestName(name)) {
       setBusy(true);
       job = guarded(sb.auth.signInAnonymously()).then(function (r) {
@@ -941,6 +1083,7 @@
     $("authNotice").hidden = true;
     err("");
     renderWho();
+    fetchAnnouncement();
     show("viewSlots");
   }
 
@@ -977,7 +1120,6 @@
     });
   }
 
-  /* ---------- chips / refill ---------- */
   function formatTime(ms) {
     var s = Math.max(0, Math.ceil(ms / 1000));
     var h = Math.floor(s / 3600), mi = Math.floor((s % 3600) / 60), se = s % 60;
@@ -1006,7 +1148,14 @@
     }
   }
 
-  /* ---------- slots ---------- */
+  function blockedText(res) {
+    if (res.blocked === "suspended") {
+      var d = res.until ? new Date(res.until) : null;
+      return "Your account is suspended" + (d && isFinite(d) ? " until " + d.toLocaleString() : "") + ". You can't spin right now.";
+    }
+    return "Slow down! You're spinning faster than the game allows.";
+  }
+
   function buildBets() {
     var box = $("bets");
     box.textContent = "";
@@ -1064,8 +1213,18 @@
       });
     }, 70);
 
-    // The server picks the symbols and does the chip math the moment this call runs.
     rpc("spin", { p_bet: wager }).then(function (res) {
+      if (res.blocked) {
+        clearInterval(shuffle);
+        reels.forEach(function (r) { r.classList.remove("spinning"); });
+        spinning = false;
+        shownChips = null;
+        if (res.profile) setProfile(res.profile);
+        $("msg").className = "message lose";
+        $("msg").textContent = blockedText(res);
+        if (viewNow === "viewSlots") renderSlots();
+        return;
+      }
       var result = res.result.map(function (i) { return SYMBOLS[i]; });
       var payout = num(res.payout);
       var stopAt = [800, 1300, 1800];
@@ -1110,8 +1269,6 @@
   }
   on($("spinBtn"), "click", spin);
 
-  /* ---------- roulette ---------- */
-  // European wheel: one green 0, numbers in real wheel order. The server picks the number.
   var WHEEL_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
   var REDS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
   var OUTSIDE_BETS = [["red", "Red"], ["black", "Black"], ["odd", "Odd"], ["even", "Even"],
@@ -1244,8 +1401,17 @@
     var args = { p_bet: wager, p_type: pick.type };
     if (pick.type === "number") args.p_pick = pick.num;
 
-    // The server picks the number and does the chip math the moment this call runs.
     rpc("roulette_spin", args).then(function (res) {
+      if (res.blocked) {
+        rSpinning = false;
+        rShownChips = null;
+        if (res.profile) setProfile(res.profile);
+        $("rBall").textContent = "–";
+        $("rMsg").className = "message lose";
+        $("rMsg").textContent = blockedText(res);
+        if (viewNow === "viewRoulette") renderRoulette();
+        return;
+      }
       var n = num(res.result);
       var idx = WHEEL_ORDER.indexOf(n);
       var seg = 360 / 37;
@@ -1287,7 +1453,6 @@
   }
   on($("rSpinBtn"), "click", rSpin);
 
-  /* ---------- leaderboard ---------- */
   var toastHandle = null;
   function toast(t) {
     var el = $("adminToast");
@@ -1296,7 +1461,6 @@
     toastHandle = later(function () { el.textContent = ""; }, 3500);
   }
 
-  // Runs an admin action on the server, then refreshes my account and the board.
   function adminDo(fn, args, doneText) {
     if (!isAdmin()) return;
     rpc(fn, args).then(function () {
@@ -1372,6 +1536,11 @@
           tag.className = "cheater"; tag.textContent = "CHEATER";
           td.appendChild(tag);
         }
+        if (idx === 1 && admin && r.suspended) {
+          var stag = document.createElement("span");
+          stag.className = "susptag"; stag.textContent = "SUSPENDED";
+          td.appendChild(stag);
+        }
         tr.appendChild(td);
       });
       if (admin) {
@@ -1416,6 +1585,23 @@
             adminDo("admin_flag_cheater", { p_id: r.id }, "Flagged " + r.username + " as a cheater for 2 days.");
           });
           box.appendChild(fl);
+          var sp = document.createElement("button");
+          sp.className = "susp";
+          sp.textContent = r.suspended ? "Unsuspend" : "Suspend";
+          sp.title = r.suspended ? "Let this player spin again" : "Stop this player from spinning for a while";
+          sp.onclick = H(function () {
+            if (r.suspended) {
+              adminDo("admin_suspend", { p_id: r.id, p_hours: 0 }, r.username + " can spin again.");
+              return;
+            }
+            var raw = window.prompt("Suspend " + r.username + " for how many hours? (1 to 720)", "24");
+            if (raw === null) return;
+            var hrs = Math.floor(Number(raw));
+            if (!isFinite(hrs) || hrs < 1) { toast("Enter a number of hours from 1 to 720."); return; }
+            hrs = Math.min(hrs, 720);
+            adminDo("admin_suspend", { p_id: r.id, p_hours: hrs }, "Suspended " + r.username + " for " + hrs + " hour" + (hrs === 1 ? "" : "s") + ".");
+          });
+          box.appendChild(sp);
           var del = document.createElement("button");
           del.className = "del"; del.textContent = "Delete";
           del.onclick = H(function () {
@@ -1431,12 +1617,10 @@
     });
   }
 
-  /* ---------- boot ---------- */
   (function init() {
     var last = getCookie("luckyslots_last_user");
     if (last) $("user").value = last;
 
-    // Was the saved copy of my account edited while the page was closed?
     var snap = load(SNAP_KEY, null);
     var snapBad = !!snap && !snapOk(snap);
 
@@ -1460,6 +1644,8 @@
       goSlots();
       refreshAuthUI();
       startGuard();
+      fetchAnnouncement();
+      every(fetchAnnouncement, 60000);
       if (snapBad && profile) caught("storage");
     });
   })();
