@@ -311,7 +311,6 @@
 
 <header>
   <nav class="nav" aria-label="Main">
-    <button id="navSlots" class="active">Slots</button>
     <button id="navBoard">Leaderboard</button>
     <button id="navCredits">Credits</button>
     <button id="navPanel" hidden>Panel</button>
@@ -383,18 +382,18 @@
   <!-- GAMES -->
   <section id="viewGames" hidden>
     <h1>Games</h1>
-    <p class="sub">Pick a game to play.</p>
+    <p class="sub">Pick a game, any game...,.,.,...,.,</p>
     <!-- To add a game later: copy one of the cards below and point it at the new game. -->
     <div class="gamegrid">
       <button class="gamecard" id="gameSlots">
-        <span class="gameicon">🎰</span>
+        <span class="gameicon">🤯</span>
         <span class="gamename">Slots</span>
-        <span class="gamedesc">Match symbols to win up to ×100.</span>
+        <span class="gamedesc">Match the same three symbols and get around 100x the amount of chips</span>
       </button>
       <button class="gamecard" id="gameRoulette">
-        <span class="gameicon">🎡</span>
+        <span class="gameicon">🤯</span>
         <span class="gamename">Roulette</span>
-        <span class="gamedesc">Bet on a color, a range, or a single number.</span>
+        <span class="gamedesc">Bet on a color, a range, or a single number. If you don't understand this then please watch a tutorial.</span>
       </button>
     </div>
   </section>
@@ -440,7 +439,7 @@
       <video id="creditsVideo" src="gamblecore.mp4" controls playsinline preload="metadata"></video>
       <div class="videoerr" id="videoErr" hidden>No way this retard forgot to put the gamblecore.mp4 video in the same folder as the .HTML 🤣🤣🤣</div>
       <!-- Write your credits text below. Press Enter for new lines. -->
-      <p class="creditstext">Write your credits here.</p>
+      <p class="creditstext">No, this "Ad" did not make this game, Matthew did.</p>
     </div>
   </section>
 
@@ -688,7 +687,6 @@
     if ((view === "viewGames" || view === "viewRoulette") && !profile) view = "viewAuth";
     viewNow = view;
     ["viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewBoard", "viewCredits", "viewPanel"].forEach(function (v) { $(v).hidden = (v !== view); });
-    $("navSlots").classList.toggle("active", view === "viewSlots" || view === "viewAuth");
     $("navBoard").classList.toggle("active", view === "viewBoard");
     $("navCredits").classList.toggle("active", view === "viewCredits");
     $("navPanel").classList.toggle("active", view === "viewPanel");
@@ -713,10 +711,6 @@
     if (view === "viewPanel") openPanel();
   }
   function goSlots() { show(profile ? "viewSlots" : "viewAuth"); }
-  on($("navSlots"), "click", function () {
-    if (profile) syncMe().then(function () { if (profile) show("viewSlots"); });
-    else goSlots();
-  });
   on($("navBoard"), "click", function () {
     if (profile) syncMe().then(function () { show("viewBoard"); });
     else show("viewBoard");
