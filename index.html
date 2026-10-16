@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GAMBLLEEEEEEEEEEEE</title>
+<style>
+  :root {
+    --felt: #0f3d2e;
+    --felt-deep: #0a2a20;
+    --brass: #d8a94b;
+    --ivory: #f5efe0;
+    --ruby: #b3262e;
+    --ink: #1b1a17;
+    --muted: #9fb8ad;
+    --cheat: #ff6666;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: radial-gradient(ellipse at 50% 0%, var(--felt) 0%, var(--felt-deep) 70%);
+    background-attachment: fixed;
+    color: var(--ivory);
+    font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  button { font: inherit; cursor: pointer; }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+
+  /* top bar */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 12px 16px; flex-wrap: wrap;
+    border-bottom: 2px solid rgba(216,169,75,.35);
+    background: rgba(0,0,0,.25);
+  }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav button {
+    background: transparent; color: var(--ivory);
+    border: 2px solid var(--brass); border-radius: 8px;
+    padding: 8px 14px; font-weight: 700;
+  }
+  .nav button.active { background: var(--brass); color: var(--ink); }
+  .nav button:hover:not(.active) { background: rgba(216,169,75,.18); }
+  .who { display: flex; align-items: center; gap: 10px; font-size: .95rem; flex-wrap: wrap; }
+  .who .name { font-weight: 700; }
+  .linkbtn { background: none; border: none; color: var(--brass); text-decoration: underline; padding: 4px; }
+  .statsbtn {
+    background: transparent; color: var(--brass); font-weight: 700;
+    border: 2px solid var(--brass); border-radius: 8px; padding: 5px 12px;
+  }
+  .statsbtn:hover { background: rgba(216,169,75,.18); }
+
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1, h2 { font-family: Rockwell, "Roboto Slab", Georgia, serif; margin: 0 0 6px; letter-spacing: .5px; }
+  h1 { font-size: 2.2rem; text-align: center; color: var(--brass); }
+  .sub { text-align: center; color: var(--muted); margin: 0 0 22px; }
+  [hidden] { display: none !important; }
+
+  /* chips */
+  .chipbar { display: flex; justify-content: center; margin-bottom: 18px; }
+  .chipcount {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--ivory); color: var(--ink);
+    border: 4px dashed var(--ruby); border-radius: 999px;
+    padding: 8px 26px 8px 12px; font-weight: 800; font-size: 1.6rem;
+  }
+  .chipcount .disc {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--ruby); border: 4px dashed var(--ivory);
+    box-shadow: 0 0 0 2px var(--ruby);
+  }
+
+  /* machine */
+  .machine {
+    background: linear-gradient(#7a1a20, #5a1217);
+    border: 6px solid var(--brass); border-radius: 22px;
+    padding: 22px 18px 20px; box-shadow: 0 14px 30px rgba(0,0,0,.45);
+  }
+  .reels { display: flex; gap: 12px; justify-content: center; margin-bottom: 18px; }
+  .reel {
+    width: 28%; max-width: 160px; aspect-ratio: 3/4;
+    background: var(--ivory); border: 5px solid var(--ink); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(2.6rem, 11vw, 5rem);
+    box-shadow: inset 0 0 18px rgba(0,0,0,.35);
+  }
+  .reel.spinning { filter: blur(1.5px); }
+  .reel.win { animation: pulse .5s ease-in-out 4; }
+  @keyframes pulse { 50% { transform: scale(1.08); box-shadow: 0 0 22px var(--brass); } }
+  @media (prefers-reduced-motion: reduce) { .reel.win { animation: none; outline: 4px solid var(--brass); } }
+
+  .message {
+    min-height: 2.6em; text-align: center; font-weight: 700; font-size: 1.15rem;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+  }
+  .message.win { color: var(--brass); }
+  .message.lose { color: #f0b7b3; }
+
+  .bets { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .bets button {
+    background: var(--felt-deep); color: var(--ivory);
+    border: 2px solid var(--brass); border-radius: 999px; padding: 7px 16px; font-weight: 700;
+  }
+  .bets button.sel { background: var(--brass); color: var(--ink); }
+  .bets button:disabled { opacity: .45; cursor: not-allowed; }
+  .betlabel { text-align: center; margin-bottom: 8px; color: #f3d9a4; }
+
+  .spin {
+    display: block; width: 100%; padding: 16px; font-size: 1.5rem; font-weight: 800;
+    background: var(--brass); color: var(--ink); border: none; border-radius: 12px;
+    box-shadow: 0 5px 0 #8f6b22;
+  }
+  .spin:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 #8f6b22; }
+  .spin:disabled { opacity: .55; cursor: not-allowed; }
+
+  .paytable { margin-top: 22px; color: var(--muted); font-size: .9rem; text-align: center; line-height: 1.7; }
+  .paytable b { color: var(--ivory); }
+
+  /* refill lock */
+  .lock {
+    margin-top: 16px; text-align: center; background: rgba(0,0,0,.35);
+    border: 2px solid var(--ruby); border-radius: 12px; padding: 14px;
+  }
+  .lock .timer { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--brass); }
+
+  /* auth */
+  .card {
+    max-width: 420px; margin: 20px auto 0; background: rgba(0,0,0,.3);
+    border: 2px solid rgba(216,169,75,.5); border-radius: 16px; padding: 22px;
+  }
+  .tabs { display: flex; margin-bottom: 18px; border-bottom: 2px solid rgba(216,169,75,.3); }
+  .tabs button {
+    flex: 1; background: none; border: none; color: var(--muted);
+    padding: 10px; font-weight: 700; border-bottom: 4px solid transparent; margin-bottom: -2px;
+  }
+  .tabs button.active { color: var(--brass); border-bottom-color: var(--brass); }
+  label { display: block; margin: 12px 0 4px; font-weight: 700; }
+  input {
+    width: 100%; padding: 11px; font: inherit; border-radius: 8px;
+    border: 2px solid transparent; background: var(--ivory); color: var(--ink);
+  }
+  .card .go {
+    margin-top: 18px; width: 100%; padding: 12px; font-weight: 800; font-size: 1.05rem;
+    background: var(--brass); color: var(--ink); border: none; border-radius: 10px;
+  }
+  .card .go:disabled { opacity: .6; cursor: wait; }
+  .error { color: #ffb4ae; margin-top: 12px; min-height: 1.3em; font-weight: 700; }
+  .hint { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: rgba(216,169,75,.15); border: 1px solid var(--brass); font-size: .9rem; }
+  .note { color: var(--muted); font-size: .85rem; margin-top: 10px; }
+
+  .notice {
+    max-width: 420px; margin: 18px auto 0; padding: 12px 14px; font-weight: 700;
+    background: rgba(179,38,46,.3); border: 2px solid var(--cheat); border-radius: 12px; color: var(--ivory);
+  }
+
+  /* leaderboard */
+  table { width: 100%; border-collapse: collapse; background: rgba(0,0,0,.28); border-radius: 12px; overflow: hidden; }
+  th, td { padding: 12px 14px; text-align: left; }
+  th { background: rgba(216,169,75,.22); color: var(--brass); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr { border-top: 1px solid rgba(245,239,224,.12); }
+  tbody tr.me { background: rgba(216,169,75,.2); font-weight: 800; }
+  .cheater { color: var(--cheat); font-weight: 800; margin-left: 6px; }
+  .adminbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    background: rgba(179,38,46,.25); border: 2px solid var(--ruby); border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 16px;
+  }
+  .adminbar label { display: flex; align-items: center; gap: 8px; margin: 0; }
+  .adminbar input[type=checkbox] { width: 20px; height: 20px; }
+  .admincell { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .admincell input { width: 90px; padding: 6px 8px; }
+  .admincell button {
+    border: 2px solid var(--brass); background: var(--felt-deep); color: var(--ivory);
+    border-radius: 8px; padding: 5px 10px; font-weight: 700;
+  }
+  .admincell button.add:hover { background: #1f6b4d; }
+  .admincell button.sub:hover { background: #7a5a1a; }
+  .admincell button.pardon { border-color: #6fd0a0; color: #a8ecc8; }
+  .admincell button.pardon:hover { background: #1f6b4d; color: var(--ivory); }
+  .admincell button.flag { border-color: #e0a040; color: #f3d9a4; }
+  .admincell button.flag:hover { background: #7a5a1a; color: var(--ivory); }
+  .admincell button.del { border-color: var(--ruby); color: #ffb4ae; }
+  .admincell button.del:hover { background: var(--ruby); color: var(--ivory); }
+  .toast { text-align: center; min-height: 1.4em; margin: 10px 0; font-weight: 700; color: var(--brass); }
+  .videowrap { max-width: 720px; margin: 0 auto; }
+  .videowrap video {
+    width: 100%; display: block; background: #000;
+    border: 6px solid var(--brass); border-radius: 14px;
+  }
+  .videoerr { text-align: center; color: #ffb4ae; font-weight: 700; margin-top: 12px; }
+  .empty { text-align: center; color: var(--muted); padding: 24px; }
+
+  /* admin panel */
+  .notifier {
+    background: rgba(0,0,0,.28); border: 2px solid rgba(216,169,75,.5);
+    border-radius: 16px; padding: 18px;
+  }
+  .notifhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .notifhead h2 { color: var(--brass); font-size: 1.5rem; margin: 0; }
+  .notifstamp { color: var(--muted); font-size: .85rem; }
+  .notifier .tabs { margin-bottom: 8px; }
+  .feed { list-style: none; margin: 0; padding: 0; max-height: 55vh; overflow-y: auto; }
+  .feeditem {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;
+    padding: 12px 8px; border-top: 1px solid rgba(245,239,224,.12);
+  }
+  .feeditem.fresh { background: rgba(216,169,75,.14); }
+  .feedname { font-weight: 800; margin-right: 8px; }
+  .feedwhy { color: var(--muted); font-size: .9rem; margin-top: 4px; }
+  .feedtime { color: #f3d9a4; font-size: .9rem; font-variant-numeric: tabular-nums; }
+  .feedempty { text-align: center; color: var(--muted); padding: 24px 8px; }
+  .pill {
+    display: inline-block; font-size: .72rem; font-weight: 800; letter-spacing: .5px;
+    padding: 2px 8px; border-radius: 999px; border: 1px solid var(--brass); color: var(--brass); margin-right: 6px;
+  }
+  .pill.test { border-color: #6fd0a0; color: #a8ecc8; }
+  .pill.bad { border-color: var(--cheat); color: var(--cheat); }
+  .pill.new { background: var(--brass); color: var(--ink); }
+  #viewPanel { padding-bottom: 90px; }
+  .panelfoot {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 14px 16px;
+    display: flex; justify-content: center; pointer-events: none;
+    background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.7));
+  }
+  .dashbtn {
+    pointer-events: auto; display: inline-block; padding: 12px 26px; font-weight: 800; font-size: 1.05rem;
+    background: var(--brass); color: var(--ink); border-radius: 10px; text-decoration: none;
+    box-shadow: 0 4px 0 #8f6b22;
+  }
+  .dashbtn:hover { filter: brightness(1.08); }
+  .dashbtn:focus-visible { outline: 3px solid var(--ivory); outline-offset: 2px; }
+
+  /* stats modal */
+  .modal {
+    position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.6); padding: 16px;
+  }
+  .modalbox {
+    width: 100%; max-width: 380px; background: var(--felt-deep);
+    border: 4px solid var(--brass); border-radius: 16px; padding: 22px;
+  }
+  .modalbox h2 { color: var(--brass); font-size: 1.6rem; margin-bottom: 14px; }
+  .statlist { display: grid; grid-template-columns: 1fr auto; gap: 0; margin: 0 0 18px; }
+  .statlist dt, .statlist dd { margin: 0; padding: 10px 0; border-bottom: 1px solid rgba(245,239,224,.15); }
+  .statlist dd { font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
+  .modalbox .close {
+    width: 100%; padding: 10px; font-weight: 800; background: var(--brass); color: var(--ink);
+    border: none; border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav" aria-label="Main">
+    <button id="navSlots" class="active">Slots</button>
+    <button id="navBoard">Leaderboard</button>
+    <button id="navCredits">Credits</button>
+    <button id="navPanel" hidden>Panel</button>
+  </nav>
+  <div class="who" id="who"></div>
+</header>
+
+<main>
+  <!-- AUTH -->
+  <section id="viewAuth" hidden>
+    <h1>Slots (soon more to come)</h1>
+    <p class="sub">hi</p>
+    <div class="notice" id="authNotice" role="alert" hidden></div>
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <button id="tabLogin" class="active" role="tab">Log in</button>
+        <button id="tabSignup" role="tab">Sign up</button>
+      </div>
+      <label for="user">Username</label>
+      <input id="user" autocomplete="username" maxlength="24">
+      <div id="passWrap">
+        <label for="pass">Password</label>
+        <input id="pass" type="password" autocomplete="current-password">
+      </div>
+      <div id="confirmWrap" hidden>
+        <label for="pass2">Confirm password</label>
+        <input id="pass2" type="password" autocomplete="new-password">
+      </div>
+      <button class="go" id="authGo">Log in</button>
+      <div class="error" id="authErr" role="alert"></div>
+      <div class="hint" id="testHint" hidden>!! THIS IS A TEST ACCOUNT, IT DOES NOT SHOW UP ON THE LEADERBOARD AND WHEN YOU LOG OUT IT DELETES EVERYTHING ON IT !!</div>
+      <div class="note">* Too many accounts made WILL get deleted, stick with your name.</div>
+    </div>
+  </section>
+
+  <!-- SLOTS -->
+  <section id="viewSlots" hidden>
+    <h1>Slots</h1>
+    <p class="sub">FAKE CHIPS! THESE ARE NOT REAL AND ARE GIVEN FOR FREE EVERY DAY.</p>
+
+    <div class="chipbar"><div class="chipcount"><span class="disc"></span><span id="chips">0</span></div></div>
+
+    <div class="machine">
+      <div class="reels">
+        <div class="reel" id="r0">🍒</div>
+        <div class="reel" id="r1">🍋</div>
+        <div class="reel" id="r2">🔔</div>
+      </div>
+      <div class="message" id="msg">Pick a bet and press "spin".</div>
+      <div class="betlabel">Bet: <b id="betShown">10</b> chips</div>
+      <div class="bets" id="bets"></div>
+      <button class="spin" id="spinBtn">SPIN</button>
+    </div>
+
+    <div class="lock" id="lock" hidden>
+      <div>You're out of chips. 1,000 chips arrives in</div>
+      <div class="timer" id="timer">24:00:00</div>
+    </div>
+
+    <div class="paytable">
+      <b>Pair</b> = bet back &nbsp; <b>Three of a kind</b> pays:<br>
+      🍒 ×5 &nbsp; 🍋 ×8 &nbsp; 🍇 ×10 &nbsp; 🔔 ×15 &nbsp; ⭐ ×25 &nbsp; 💎 ×50 &nbsp; 7️⃣ ×100
+    </div>
+  </section>
+
+  <!-- CREDITS -->
+  <section id="viewCredits" hidden>
+    <h1>Credits</h1>
+    <div class="videowrap">
+      <video id="creditsVideo" src="gamblecore.mp4" controls playsinline preload="metadata"></video>
+      <div class="videoerr" id="videoErr" hidden>No way this retard forgot to put the gamblecore.mp4 video in the same folder as the .HTML 🤣🤣🤣</div>
+    </div>
+  </section>
+
+  <!-- LEADERBOARD -->
+  <section id="viewBoard" hidden>
+    <h1>Leaderboard</h1>
+    <p class="sub">Current and most chips shown for everybody.</p>
+    <div class="adminbar" id="adminBar" hidden>
+      <b>Admin tools</b>
+      <label><input type="checkbox" id="showAdmin"> Show my account on the leaderboard</label>
+    </div>
+    <div class="toast" id="adminToast" role="status"></div>
+    <table>
+      <thead><tr><th>#</th><th>Player</th><th class="num">Chips</th><th class="num">Best ever</th><th id="adminTh" hidden>Admin</th></tr></thead>
+      <tbody id="boardBody"></tbody>
+    </table>
+  </section>
+
+  <!-- ADMIN PANEL -->
+  <section id="viewPanel" hidden>
+    <h1>Panel</h1>
+    <p class="sub">People who are logged into this account SHOULD be the only ones seing this.</p>
+    <div class="notifier">
+      <div class="notifhead">
+        <h2>Notifier</h2>
+        <span class="notifstamp" id="notifStamp"></span>
+      </div>
+      <div class="tabs" role="tablist">
+        <button id="tabAccounts" class="active" role="tab">New accounts</button>
+        <button id="tabCheats" role="tab">Who cheated</button>
+      </div>
+      <ul class="feed" id="feed"></ul>
+    </div>
+    <div class="panelfoot">
+      <a class="dashbtn" href="https://supabase.com/dashboard/project/roaqfrcbcwwloohrjjzm" target="_blank" rel="noopener">Open Supabase dashboard</a>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="statsModal" hidden role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+  <div class="modalbox">
+    <h2 id="statsTitle">Your stats</h2>
+    <dl class="statlist" id="statsList"></dl>
+    <button class="close" id="statsClose">Close</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Supabase connection ---------- */
+  var SUPABASE_URL = "https://roaqfrcbcwwloohrjjzm.supabase.co";
+  var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvYXFmcmNiY3d3bG9vaHJqanptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMjIwNzEsImV4cCI6MjEwNzY5ODA3MX0.4NkP7UdaRm6SSUU-wC9DkpHY7RtjU50bKfoJLYrWZJY";
+  // Supabase logins need an email, so each username is turned into a made-up one.
+  // Nobody ever sees it and no email is ever sent.
+  var EMAIL_DOMAIN = "luckyslots.game";
+
+  var sb = null;
+  try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch (e) { sb = null; }
+
+  /* ---------- constants ---------- */
+  var SNAP_KEY = "luckyslots_snap_v1";
+  var NOTICE_KEY = "luckyslots_notice_v1";
+  var SIG_SECRET = "ls-9f3a71c2-b8d4-4e07";
+  var SYMBOLS = ["🍒", "🍋", "🍇", "🔔", "⭐", "💎", "7️⃣"];
+  var BET_OPTIONS = [5, 10, 25, 50, 100];
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- state ---------- */
+  var profile = null;      // my account row from the server, or null when logged out
+  var bet = 10;
+  var spinning = false;
+  var shownChips = null;   // chip count displayed while reels are spinning
+  var timerHandle = null;
+  var boardTimer = null;
+  var viewNow = "viewAuth";
+  var lastRefillTry = 0;
+  var busy = false;
+  var guardObs = null;     // watches the page for outside edits
+  var tampering = false;   // true once a tamper has been caught
+
+  var isAdmin = function () { return !!(profile && profile.is_admin); };
+
+  /*
+    Meant to scare off anybody who tries modifying the code
+    using Inspect Element.
+  */
+  function H(fn) {
+    return function () {
+      try { return fn.apply(this, arguments); }
+      finally { if (guardObs) guardObs.takeRecords(); }
+    };
+  }
+  function on(el, ev, fn) { el.addEventListener(ev, H(fn)); }
+  function later(fn, ms) { return setTimeout(H(fn), ms); }
+  function every(fn, ms) { return setInterval(H(fn), ms); }
+  // Wraps a promise so that every callback attached to it also runs through H().
+  function guarded(p) {
+    return {
+      then: function (a, b) { return guarded(p.then(a && H(a), b && H(b))); },
+      "catch": function (b) { return guarded(p.catch(b && H(b))); }
+    };
+  }
+
+  /* ---------- small helpers ---------- */
+  function num(x) { x = Number(x); return isFinite(x) ? x : 0; }
+  function load(key, fallback) {
+    try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch (e) { return fallback; }
+  }
+  function save(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+    catch (e) { return false; }
+  }
+  function drop(key) { try { localStorage.removeItem(key); } catch (e) {} }
+  function setCookie(name, value, days) {
+    try { document.cookie = name + "=" + encodeURIComponent(value) + ";max-age=" + (days * 86400) + ";path=/;SameSite=Lax"; } catch (e) {}
+  }
+  function getCookie(name) {
+    try {
+      var m = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+      return m ? decodeURIComponent(m[1]) : "";
+    } catch (e) { return ""; }
+  }
+  function cyrb53(str, seed) {
+    var h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for (var i = 0; i < str.length; i++) {
+      var c = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ c, 2654435761);
+      h2 = Math.imul(h2 ^ c, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
+  }
+
+  /* ---------- FAKE anti-cheat ---------- */
+  function snapSig(p) {
+    var f = [p.id, p.username, p.chips, p.peak, p.refill_at || 0, p.pairs, p.jackpots, p.losses,
+             p.spent, p.cheats, p.cheater_until || 0, p.is_admin ? 1 : 0, p.show_on_board ? 1 : 0,
+             p.is_test ? 1 : 0];
+    return cyrb53(f.join("|") + "|" + SIG_SECRET, 7);
+  }
+  function snapOk(s) { return !!s && typeof s === "object" && !!s.p && s.sig === snapSig(s.p); }
+  function saveSnap() {
+    if (!profile) { drop(SNAP_KEY); return; }
+    save(SNAP_KEY, { p: profile, sig: snapSig(profile) });
+  }
+  function setProfile(p) { profile = p; saveSnap(); }
+
+  function caught(kind) {
+    if (tampering || !profile || isAdmin()) return;   // admins are exempt
+    tampering = true;
+    if (guardObs) guardObs.disconnect();
+    stopTimer();
+    var wasTest = !!profile.is_test;
+    rpc("report_cheat", { p_kind: kind }).catch(function () {}).then(function () {
+      save(NOTICE_KEY, { kind: kind, test: wasTest });
+      drop(SNAP_KEY);
+      return guarded(sb.auth.signOut({ scope: "local" }));
+    }).catch(function () {}).then(function () {
+      location.reload();
+    });
+  }
+
+  function integrityTick() {
+    if (tampering || !profile || isAdmin()) return;
+    var s = load(SNAP_KEY, null);
+    if (!s) { forceLogout(""); return; }               // saved data was removed
+    if (!snapOk(s)) caught("storage");                  // saved data was edited
+  }
+
+  function showNotice() {
+    var n = load(NOTICE_KEY, null);
+    if (!n) return;
+    drop(NOTICE_KEY);
+    var el = $("authNotice");
+    el.textContent = (n.kind === "storage"
+      ? "You were logged out because your saved game data was edited."
+      : "You were logged out because the page was edited in Inspect Element.")
+      + (n.test ? " Your test account was deleted." : " Your account is marked CHEATER for 2 days unless you're 'pardoned'.");
+    el.hidden = false;
+  }
+
+  function startGuard() {
+    guardObs = new MutationObserver(function (records) {
+      var outside = records.some(function (r) {
+        if (r.type !== "attributes") return true;
+        var a = r.attributeName || "";
+        if (a.indexOf("data-") === 0) return false;                       // markers added by extensions
+        if (r.target.tagName === "INPUT" && a === "style") return false;  // password-manager icons
+        return true;
+      });
+      if (outside) caught("page");
+    });
+    ["who", "viewAuth", "viewSlots", "viewBoard", "viewCredits", "viewPanel", "statsModal"].forEach(function (id) {
+      guardObs.observe($(id), { childList: true, subtree: true, attributes: true, characterData: true });
+    });
+    guardObs.observe(document.querySelector("header"), { childList: true, subtree: true, attributes: true, characterData: true });
+    guardObs.observe(document.querySelector("main"), { childList: true, attributes: true });
+    guardObs.takeRecords();
+    every(integrityTick, 1000);
+  }
+
+  /* ---------- server calls ---------- */
+  function rpc(name, args) {
+    return guarded(sb.rpc(name, args || {}).then(function (r) {
+      if (r.error) throw new Error(r.error.message || "Server error");
+      return r.data;
+    }));
+  }
+  function friendly(e) {
+    var m = (e && e.message) ? e.message : String(e);
+    if (/username_taken|already registered|already been registered/i.test(m)) return "That username is taken.";
+    if (/invalid login/i.test(m)) return "Wrong username or password.";
+    if (/anonymous/i.test(m)) return "Test accounts need \"Anonymous sign-ins\" turned on in Supabase (Authentication > Sign In / Providers).";
+    if (/email/i.test(m) && /invalid/i.test(m)) return "Supabase rejected the made-up email. Change EMAIL_DOMAIN at the top of the script to a domain that really exists.";
+    if (/password/i.test(m) && /(characters|weak|short)/i.test(m)) return "Password must be at least 6 characters.";
+    if (/rate limit/i.test(m)) return "Too many attempts. Wait a bit and try again.";
+    if (/bad_username/i.test(m)) return "Username: 3-16 letters, numbers or underscores.";
+    if (/failed to fetch|networkerror|load failed/i.test(m)) return "Can't reach the server. Check your connection.";
+    return m;
+  }
+  function refreshMe() {
+    return rpc("refresh_me").then(function (p) {
+      setProfile((p && p.id) ? p : null);
+      return profile;
+    }).catch(function () { return profile; });
+  }
+  // Re-reads account; if it vanished (an admin removed it), log out.
+  function syncMe() {
+    var was = !!profile;
+    return refreshMe().then(function (p) {
+      if (was && !p) forceLogout("Your account was removed or your session ended.");
+      return p;
+    });
+  }
+
+  /* ---------- views ---------- */
+  function show(view) {
+    if (view === "viewPanel" && !isAdmin()) view = profile ? "viewSlots" : "viewAuth";
+    viewNow = view;
+    ["viewAuth", "viewSlots", "viewBoard", "viewCredits", "viewPanel"].forEach(function (v) { $(v).hidden = (v !== view); });
+    $("navSlots").classList.toggle("active", view === "viewSlots" || view === "viewAuth");
+    $("navBoard").classList.toggle("active", view === "viewBoard");
+    $("navCredits").classList.toggle("active", view === "viewCredits");
+    $("navPanel").classList.toggle("active", view === "viewPanel");
+    var vid = $("creditsVideo");
+    if (view === "viewCredits") {
+      $("videoErr").hidden = true;
+      vid.currentTime = 0;
+      var p = vid.play();
+      if (p && p.catch) p.catch(function () {});
+    } else if (!vid.paused) {
+      vid.pause();
+    }
+    if (boardTimer) { clearInterval(boardTimer); boardTimer = null; }
+    if (panelTimer) { clearInterval(panelTimer); panelTimer = null; }
+    if (view === "viewSlots") renderSlots();
+    if (view === "viewBoard") {
+      renderBoard();
+      // Keep it fresh for everyone watching (admins skip this so typed amounts aren't wiped).
+      boardTimer = every(function () { if (viewNow === "viewBoard" && !isAdmin()) renderBoard(); }, 10000);
+    }
+    if (view === "viewPanel") openPanel();
+  }
+  function goSlots() { show(profile ? "viewSlots" : "viewAuth"); }
+  on($("navSlots"), "click", function () {
+    if (profile) syncMe().then(function () { if (profile) show("viewSlots"); });
+    else goSlots();
+  });
+  on($("navBoard"), "click", function () {
+    if (profile) syncMe().then(function () { show("viewBoard"); });
+    else show("viewBoard");
+  });
+  on($("navCredits"), "click", function () { show("viewCredits"); });
+  on($("creditsVideo"), "error", function () { $("videoErr").hidden = false; });
+
+  /* ---------- admin panel: notifier ---------- */
+  var PANEL_SEEN_KEY = "luckyslots_panelseen_v1";
+  var panelTab = "accounts";
+  var panelTimer = null;
+  var panelSeen = 0;   // events newer than this get a NEW tag (the last time the Panel was opened)
+  var CHEAT_WHY = {
+    page: "Edited the page in Inspect Element",
+    storage: "Edited the saved game data",
+    admin: "Flagged by an admin"
+  };
+
+  on($("navPanel"), "click", function () {
+    syncMe().then(function () { if (isAdmin()) show("viewPanel"); });
+  });
+  function setPanelTab(t) {
+    panelTab = t;
+    $("tabAccounts").classList.toggle("active", t === "accounts");
+    $("tabCheats").classList.toggle("active", t === "cheats");
+    renderPanel();
+  }
+  on($("tabAccounts"), "click", function () { setPanelTab("accounts"); });
+  on($("tabCheats"), "click", function () { setPanelTab("cheats"); });
+
+  function openPanel() {
+    panelSeen = num(load(PANEL_SEEN_KEY, 0));
+    save(PANEL_SEEN_KEY, Date.now());
+    renderPanel();
+    panelTimer = every(function () { if (viewNow === "viewPanel") renderPanel(); }, 5000);
+  }
+  function feedMsg(text) {
+    var feed = $("feed");
+    feed.textContent = "";
+    var li = document.createElement("li");
+    li.className = "feedempty";
+    li.textContent = text;
+    feed.appendChild(li);
+  }
+  function renderPanel() {
+    if (!isAdmin() || !sb) return;
+    var tabNow = panelTab;
+    rpc("admin_get_events", { p_kind: tabNow, p_limit: 100 }).then(function (rows) {
+      if (viewNow !== "viewPanel" || panelTab !== tabNow) return;
+      drawFeed(rows || [], tabNow);
+      $("notifStamp").textContent = "Updated " + new Date().toLocaleTimeString();
+    }).catch(function () {
+      if (viewNow !== "viewPanel") return;
+      feedMsg("Couldn't load the notifier. Did you run the new SQL in Supabase?");
+    });
+  }
+  function drawFeed(rows, kind) {
+    var feed = $("feed");
+    feed.textContent = "";
+    if (!rows.length) {
+      feedMsg(kind === "cheats" ? "Nobody has cheated yet." : "No new accounts yet.");
+      return;
+    }
+    rows.forEach(function (r) {
+      var when = Date.parse(r.created_at);
+      var fresh = isFinite(when) && when > panelSeen;
+      var li = document.createElement("li");
+      li.className = "feeditem" + (fresh ? " fresh" : "");
+      var left = document.createElement("div");
+      var name = document.createElement("span");
+      name.className = "feedname"; name.textContent = r.username;
+      left.appendChild(name);
+      var pill = document.createElement("span");
+      if (kind === "cheats") { pill.className = "pill bad"; pill.textContent = "CHEATED"; }
+      else if (r.kind === "test_signup") { pill.className = "pill test"; pill.textContent = "TEST ACCOUNT"; }
+      else { pill.className = "pill"; pill.textContent = "NEW ACCOUNT"; }
+      left.appendChild(pill);
+      if (fresh) {
+        var nw = document.createElement("span");
+        nw.className = "pill new"; nw.textContent = "NEW";
+        left.appendChild(nw);
+      }
+      if (kind === "cheats") {
+        var why = document.createElement("div");
+        why.className = "feedwhy";
+        why.textContent = CHEAT_WHY[r.detail] || "Tamper detected";
+        left.appendChild(why);
+      }
+      var right = document.createElement("time");
+      right.className = "feedtime";
+      right.textContent = isFinite(when) ? new Date(when).toLocaleString() : "";
+      li.appendChild(left); li.appendChild(right);
+      feed.appendChild(li);
+    });
+  }
+
+  /* ---------- header: stats + who ---------- */
+  function renderWho() {
+    var w = $("who");
+    w.textContent = "";
+    $("navPanel").hidden = !isAdmin();   // the Panel tab only exists for the admin
+    if (profile) {
+      var st = document.createElement("button");
+      st.className = "statsbtn"; st.textContent = "Stats";
+      st.onclick = H(openStats);
+      var span = document.createElement("span");
+      span.textContent = "Playing as ";
+      var b = document.createElement("span");
+      b.className = "name";
+      b.textContent = profile.username + (isAdmin() ? " (admin)" : (profile.is_test ? " (test)" : ""));
+      var out = document.createElement("button");
+      out.className = "linkbtn"; out.textContent = "Log out";
+      out.onclick = H(logout);
+      w.appendChild(st); w.appendChild(span); w.appendChild(b); w.appendChild(out);
+    } else {
+      var s = document.createElement("span");
+      s.textContent = "Not signed in";
+      w.appendChild(s);
+    }
+  }
+
+  function openStats() {
+    var m = profile;
+    if (!m) return;
+    var list = $("statsList");
+    list.textContent = "";
+    [["Pairs", m.pairs], ["Jackpots", m.jackpots], ["Losses", m.losses],
+     ["Chips spent", m.spent], ["Times you tried to cheat", m.cheats]].forEach(function (row) {
+      var dt = document.createElement("dt"); dt.textContent = row[0];
+      var dd = document.createElement("dd"); dd.textContent = num(row[1]).toLocaleString();
+      list.appendChild(dt); list.appendChild(dd);
+    });
+    $("statsModal").hidden = false;
+    $("statsClose").focus();
+  }
+  function closeStats() { $("statsModal").hidden = true; }
+  on($("statsClose"), "click", closeStats);
+  on($("statsModal"), "click", function (e) { if (e.target === $("statsModal")) closeStats(); });
+  document.addEventListener("keydown", H(function (e) {
+    if (e.key === "Escape" && !$("statsModal").hidden) closeStats();
+  }));
+
+  /* ---------- auth ---------- */
+  var mode = "login";
+  function isTestName(name) { return /^TESTACCOUNT\d{1,10}$/i.test(name); }
+  function emailFor(name) { return name.toLowerCase() + "@" + EMAIL_DOMAIN; }
+
+  function refreshAuthUI() {
+    var test = isTestName($("user").value.trim());
+    $("passWrap").hidden = test;
+    $("confirmWrap").hidden = test || mode !== "signup";
+    $("testHint").hidden = !test;
+  }
+  function setMode(m) {
+    mode = m;
+    $("tabLogin").classList.toggle("active", m === "login");
+    $("tabSignup").classList.toggle("active", m === "signup");
+    $("authGo").textContent = m === "login" ? "Log in" : "Create account";
+    $("pass").autocomplete = m === "login" ? "current-password" : "new-password";
+    $("authErr").textContent = "";
+    refreshAuthUI();
+  }
+  on($("tabLogin"), "click", function () { setMode("login"); });
+  on($("tabSignup"), "click", function () { setMode("signup"); });
+  on($("user"), "input", refreshAuthUI);
+
+  function err(t) { $("authErr").textContent = t; }
+  function setBusy(b) { busy = b; $("authGo").disabled = b; }
+
+  function submitAuth() {
+    if (busy) return;
+    if (!sb) { err("Couldn't load Supabase. Check your internet connection and reload."); return; }
+    var name = $("user").value.trim();
+    var pw = $("pass").value;
+    err("");
+    var job;
+
+    // Throwaway test accounts: no password, hidden from the board, deleted on log out.
+    if (isTestName(name)) {
+      setBusy(true);
+      job = guarded(sb.auth.signInAnonymously()).then(function (r) {
+        if (r.error) throw r.error;
+        return rpc("create_profile", { p_username: name, p_test: true });
+      });
+    } else {
+      if (!/^[A-Za-z0-9_]{3,16}$/.test(name)) { err("Username: 3-16 letters, numbers or underscores."); return; }
+      if (pw.length < 6) { err("Password must be at least 6 characters."); return; }
+      if (mode === "signup" && pw !== $("pass2").value) { err("Passwords don't match."); return; }
+      setBusy(true);
+      if (mode === "signup") {
+        job = guarded(sb.auth.signUp({ email: emailFor(name), password: pw })).then(function (r) {
+          if (r.error) throw r.error;
+          if (!r.data || !r.data.session) {
+            throw new Error("Turn off \"Confirm email\" in Supabase (Authentication > Sign In / Providers > Email) so new accounts can log in right away.");
+          }
+          return rpc("create_profile", { p_username: name, p_test: false });
+        }).catch(function (e) {
+          return guarded(sb.auth.signOut({ scope: "local" })).then(function () { throw e; });
+        });
+      } else {
+        job = guarded(sb.auth.signInWithPassword({ email: emailFor(name), password: pw })).then(function (r) {
+          if (r.error) throw r.error;
+          return rpc("refresh_me");
+        }).then(function (p) {
+          return (p && p.id) ? p : rpc("create_profile", { p_username: name, p_test: false });
+        });
+      }
+    }
+
+    job.then(afterLogin).catch(function (e) {
+      err(friendly(e));
+    }).then(function () { setBusy(false); });
+  }
+  on($("authGo"), "click", submitAuth);
+  ["user", "pass", "pass2"].forEach(function (id) {
+    on($(id), "keydown", function (e) { if (e.key === "Enter") submitAuth(); });
+  });
+
+  function afterLogin(p) {
+    setProfile(p);
+    if (!p.is_test && !p.is_admin) setCookie("luckyslots_last_user", p.username, 365);
+    $("pass").value = ""; $("pass2").value = "";
+    $("authNotice").hidden = true;
+    err("");
+    renderWho();
+    show("viewSlots");
+  }
+
+  function resetToLoggedOut() {
+    setProfile(null);
+    spinning = false;
+    shownChips = null;
+    stopTimer();
+    closeStats();
+    renderWho();
+    $("msg").textContent = "Pick a bet and pull the lever.";
+    $("msg").className = "message";
+    show("viewAuth");
+    refreshAuthUI();
+  }
+  function forceLogout(message) {
+    guarded(sb.auth.signOut({ scope: "local" })).catch(function () {}).then(function () {
+      resetToLoggedOut();
+      err(message || "");
+    });
+  }
+  function logout() {
+    var wasTest = !!(profile && profile.is_test);
+    var first = wasTest ? rpc("delete_test_account").catch(function () {}) : guarded(Promise.resolve());
+    first.then(function () {
+      return guarded(sb.auth.signOut({ scope: "local" }));
+    }).catch(function () {}).then(function () {
+      if (wasTest) $("user").value = "";
+      resetToLoggedOut();
+    });
+  }
+
+  /* ---------- chips / refill ---------- */
+  function formatTime(ms) {
+    var s = Math.max(0, Math.ceil(ms / 1000));
+    var h = Math.floor(s / 3600), mi = Math.floor((s % 3600) / 60), se = s % 60;
+    return [h, mi, se].map(function (n) { return ("0" + n).slice(-2); }).join(":");
+  }
+  function stopTimer() { if (timerHandle) { clearInterval(timerHandle); timerHandle = null; } }
+  function tick() {
+    if (!profile) return;
+    if (profile.chips <= 0 && profile.refill_at) {
+      var left = Date.parse(profile.refill_at) - Date.now();
+      if (left <= 0) {
+        $("timer").textContent = "00:00:00";
+        if (Date.now() - lastRefillTry > 3000) {
+          lastRefillTry = Date.now();
+          syncMe().then(function () { if (profile && viewNow === "viewSlots") renderSlots(); });
+        }
+      } else {
+        $("timer").textContent = formatTime(left);
+      }
+    }
+  }
+
+  /* ---------- slots ---------- */
+  function buildBets() {
+    var box = $("bets");
+    box.textContent = "";
+    var chips = profile ? profile.chips : 0;
+    BET_OPTIONS.concat(["MAX"]).forEach(function (opt) {
+      var btn = document.createElement("button");
+      var val = opt === "MAX" ? chips : opt;
+      btn.textContent = opt === "MAX" ? "All in" : String(opt);
+      btn.disabled = spinning || chips <= 0 || (opt !== "MAX" && opt > chips);
+      if ((opt === "MAX" && bet === chips && chips > 0 && BET_OPTIONS.indexOf(chips) === -1) || (opt !== "MAX" && opt === bet)) {
+        btn.className = "sel";
+      }
+      btn.onclick = H(function () { bet = val; buildBets(); $("betShown").textContent = bet; });
+      box.appendChild(btn);
+    });
+  }
+
+  function renderSlots() {
+    var m = profile;
+    if (!m) return;
+    var shown = (spinning && shownChips !== null) ? shownChips : m.chips;
+    $("chips").textContent = shown.toLocaleString();
+    if (!spinning) {
+      if (bet > m.chips) bet = Math.max(0, m.chips);
+      if (m.chips > 0 && bet === 0) bet = Math.min(10, m.chips);
+    }
+    $("betShown").textContent = bet;
+    var broke = !spinning && m.chips <= 0;
+    $("lock").hidden = !broke;
+    $("spinBtn").disabled = spinning || broke;
+    buildBets();
+    stopTimer();
+    if (broke) { tick(); timerHandle = every(tick, 500); }
+  }
+
+  function spin() {
+    if (spinning || !profile) return;
+    if (profile.chips <= 0) { renderSlots(); return; }
+    if (bet <= 0 || bet > profile.chips) bet = Math.min(10, profile.chips);
+
+    var wager = bet;
+    spinning = true;
+    shownChips = profile.chips - wager;
+    $("chips").textContent = shownChips.toLocaleString();
+    $("spinBtn").disabled = true;
+    buildBets();
+    $("msg").className = "message";
+    $("msg").textContent = "Spinning...";
+
+    var reels = [$("r0"), $("r1"), $("r2")];
+    reels.forEach(function (r) { r.classList.remove("win"); r.classList.add("spinning"); });
+    var shuffle = every(function () {
+      reels.forEach(function (r) {
+        if (r.classList.contains("spinning")) r.textContent = SYMBOLS[Math.floor(Math.random() * 7)];
+      });
+    }, 70);
+
+    // The server picks the symbols and does the chip math the moment this call runs.
+    rpc("spin", { p_bet: wager }).then(function (res) {
+      var result = res.result.map(function (i) { return SYMBOLS[i]; });
+      var payout = num(res.payout);
+      var stopAt = [800, 1300, 1800];
+      reels.forEach(function (r, i) {
+        later(function () {
+          r.classList.remove("spinning");
+          r.textContent = result[i];
+        }, stopAt[i]);
+      });
+      later(function () {
+        clearInterval(shuffle);
+        spinning = false;
+        shownChips = null;
+        setProfile(res.profile);
+        var msg = $("msg");
+        if (res.kind === "triple") {
+          msg.className = "message win";
+          msg.textContent = "JACKPOT! Three " + result[0] + " pays " + payout.toLocaleString() + " chips!";
+          reels.forEach(function (r) { r.classList.add("win"); });
+        } else if (res.kind === "pair") {
+          msg.className = "message win";
+          msg.textContent = "A pair. Your " + wager + " chips come back.";
+        } else {
+          msg.className = "message lose";
+          msg.textContent = (profile.chips <= 0)
+            ? "No match. That was your last chip."
+            : "No match. You lose " + wager + " chips.";
+        }
+        if (viewNow === "viewSlots") renderSlots();
+      }, stopAt[2] + 150);
+    }).catch(function (e) {
+      clearInterval(shuffle);
+      reels.forEach(function (r) { r.classList.remove("spinning"); });
+      spinning = false;
+      shownChips = null;
+      $("msg").className = "message lose";
+      $("msg").textContent = /not_signed_in|no_profile/i.test(e.message || "")
+        ? "Your session ended. Please log in again."
+        : "That spin didn't go through. Try again.";
+      syncMe().then(function () { if (profile && viewNow === "viewSlots") renderSlots(); });
+    });
+  }
+  on($("spinBtn"), "click", spin);
+
+  /* ---------- leaderboard ---------- */
+  var toastHandle = null;
+  function toast(t) {
+    var el = $("adminToast");
+    el.textContent = t;
+    if (toastHandle) clearTimeout(toastHandle);
+    toastHandle = later(function () { el.textContent = ""; }, 3500);
+  }
+
+  // Runs an admin action on the server, then refreshes my account and the board.
+  function adminDo(fn, args, doneText) {
+    if (!isAdmin()) return;
+    rpc(fn, args).then(function () {
+      toast(doneText);
+      return refreshMe();
+    }).then(function () {
+      if (!profile) { forceLogout("Your account was removed or your session ended."); return; }
+      renderWho();
+      renderBoard();
+    }).catch(function (e) {
+      toast(/not_admin/.test(e.message || "") ? "Only the admin can do that." : "That didn't go through.");
+    });
+  }
+
+  on($("showAdmin"), "change", function () {
+    if (!isAdmin()) return;
+    var checked = $("showAdmin").checked;
+    rpc("set_show_on_board", { p_show: checked }).then(refreshMe).then(function () {
+      renderBoard();
+    }).catch(function () { toast("That didn't go through."); });
+  });
+
+  function renderBoard() {
+    var admin = isAdmin();
+    $("adminBar").hidden = !admin;
+    $("adminTh").hidden = !admin;
+    if (admin) $("showAdmin").checked = !!profile.show_on_board;
+
+    var body = $("boardBody");
+    if (!sb) {
+      body.textContent = "";
+      var trE = document.createElement("tr"), tdE = document.createElement("td");
+      tdE.colSpan = admin ? 5 : 4; tdE.className = "empty";
+      tdE.textContent = "Couldn't load Supabase. Check your internet connection.";
+      trE.appendChild(tdE); body.appendChild(trE);
+      return;
+    }
+
+    rpc("get_leaderboard").then(function (rows) {
+      if (viewNow !== "viewBoard") return;
+      draw(rows || [], admin);
+    }).catch(function () {
+      body.textContent = "";
+      var tr = document.createElement("tr"), td = document.createElement("td");
+      td.colSpan = admin ? 5 : 4; td.className = "empty";
+      td.textContent = "Couldn't load the leaderboard. Is the SQL set up in Supabase?";
+      tr.appendChild(td); body.appendChild(tr);
+    });
+  }
+
+  function draw(rows, admin) {
+    var body = $("boardBody");
+    body.textContent = "";
+    if (!rows.length) {
+      var tr0 = document.createElement("tr");
+      var td0 = document.createElement("td");
+      td0.colSpan = admin ? 5 : 4; td0.className = "empty";
+      td0.textContent = "Yeesh what a desert";
+      tr0.appendChild(td0); body.appendChild(tr0);
+      return;
+    }
+    rows.forEach(function (r, i) {
+      var chips = num(r.chips), peak = num(r.peak) || chips;
+      var tr = document.createElement("tr");
+      if (r.is_me) tr.className = "me";
+      var cells = [String(i + 1), r.username, chips.toLocaleString(), peak.toLocaleString()];
+      cells.forEach(function (c, idx) {
+        var td = document.createElement("td");
+        if (idx >= 2) td.className = "num";
+        td.textContent = c;
+        if (idx === 1 && r.cheater) {
+          var tag = document.createElement("span");
+          tag.className = "cheater"; tag.textContent = "CHEATER";
+          td.appendChild(tag);
+        }
+        tr.appendChild(td);
+      });
+      if (admin) {
+        var td = document.createElement("td");
+        var box = document.createElement("div");
+        box.className = "admincell";
+        var input = document.createElement("input");
+        input.type = "number"; input.min = "1"; input.step = "1"; input.placeholder = "Chips";
+        input.setAttribute("aria-label", "Chip amount for " + r.username);
+        var add = document.createElement("button");
+        add.className = "add"; add.textContent = "Add";
+        var sub = document.createElement("button");
+        sub.className = "sub"; sub.textContent = "Remove";
+        var amount = function () {
+          var n = Math.floor(Number(input.value));
+          if (!isFinite(n) || n <= 0) { toast("Enter a chip amount above 0."); return 0; }
+          return n;
+        };
+        add.onclick = H(function () {
+          var n = amount();
+          if (n) adminDo("admin_adjust", { p_id: r.id, p_delta: n }, "Added " + n.toLocaleString() + " chips to " + r.username + ".");
+        });
+        sub.onclick = H(function () {
+          var n = amount();
+          if (n) adminDo("admin_adjust", { p_id: r.id, p_delta: -n }, "Removed " + n.toLocaleString() + " chips from " + r.username + ".");
+        });
+        box.appendChild(input); box.appendChild(add); box.appendChild(sub);
+        if (r.cheater || num(r.cheats) > 0) {
+          var pd = document.createElement("button");
+          pd.className = "pardon"; pd.textContent = "Pardon";
+          pd.title = "Remove the cheater tag and reset the cheat count";
+          pd.onclick = H(function () {
+            adminDo("admin_pardon", { p_id: r.id }, "Cleared the cheater penalty for " + r.username + ".");
+          });
+          box.appendChild(pd);
+        }
+        if (!r.is_me) {
+          var fl = document.createElement("button");
+          fl.className = "flag"; fl.textContent = "Flag";
+          fl.title = "Mark as CHEATER for 2 days";
+          fl.onclick = H(function () {
+            adminDo("admin_flag_cheater", { p_id: r.id }, "Flagged " + r.username + " as a cheater for 2 days.");
+          });
+          box.appendChild(fl);
+          var del = document.createElement("button");
+          del.className = "del"; del.textContent = "Delete";
+          del.onclick = H(function () {
+            if (!window.confirm("Remove " + r.username + " from the game? Their account and chips will be deleted.")) return;
+            adminDo("admin_delete", { p_id: r.id }, r.username + " was removed.");
+          });
+          box.appendChild(del);
+        }
+        td.appendChild(box);
+        tr.appendChild(td);
+      }
+      body.appendChild(tr);
+    });
+  }
+
+  /* ---------- boot ---------- */
+  (function init() {
+    var last = getCookie("luckyslots_last_user");
+    if (last) $("user").value = last;
+
+    // Was the saved copy of my account edited while the page was closed?
+    var snap = load(SNAP_KEY, null);
+    var snapBad = !!snap && !snapOk(snap);
+
+    renderWho();
+    refreshAuthUI();
+    showNotice();
+
+    if (!sb) {
+      show("viewAuth");
+      err("Couldn't load Supabase. Check your internet connection and reload.");
+      startGuard();
+      return;
+    }
+
+    guarded(sb.auth.getSession()).then(function (r) {
+      if (r.data && r.data.session) return refreshMe();
+      drop(SNAP_KEY);
+      return null;
+    }).catch(function () { return null; }).then(function () {
+      renderWho();
+      goSlots();
+      refreshAuthUI();
+      startGuard();
+      if (snapBad && profile) caught("storage");
+    });
+  })();
+})();
+</script>
+</body>
+</html>
