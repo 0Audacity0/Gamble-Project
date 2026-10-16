@@ -42,6 +42,8 @@
   }
   .nav button.active { background: var(--brass); color: var(--ink); }
   .nav button:hover:not(.active) { background: rgba(216,169,75,.18); }
+  .hright { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .version { font-size: .8rem; color: var(--muted); }
   .who { display: flex; align-items: center; gap: 10px; font-size: .95rem; flex-wrap: wrap; }
   .who .name { font-weight: 700; }
   .linkbtn { background: none; border: none; color: var(--brass); text-decoration: underline; padding: 4px; }
@@ -190,7 +192,61 @@
     border: 6px solid var(--brass); border-radius: 14px;
   }
   .videoerr { text-align: center; color: #ffb4ae; font-weight: 700; margin-top: 12px; }
+  .creditstext { text-align: center; color: var(--ivory); margin: 16px 0 0; line-height: 1.5; white-space: pre-line; }
   .empty { text-align: center; color: var(--muted); padding: 24px; }
+
+  /* games menu */
+  .gamegrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .gamecard {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: rgba(0,0,0,.3); color: var(--ivory); text-align: center;
+    border: 2px solid var(--brass); border-radius: 16px; padding: 24px 16px;
+  }
+  .gamecard:hover { background: rgba(216,169,75,.18); }
+  .gameicon { font-size: 3rem; line-height: 1; }
+  .gamename { font-family: Rockwell, "Roboto Slab", Georgia, serif; font-size: 1.5rem; font-weight: 800; color: var(--brass); }
+  .gamedesc { color: var(--muted); font-size: .9rem; }
+
+  /* roulette */
+  .wheelwrap { position: relative; width: min(300px, 78vw); aspect-ratio: 1; margin: 10px auto 18px; }
+  .wheelpointer {
+    position: absolute; top: -10px; left: 50%; transform: translateX(-50%); z-index: 3;
+    width: 0; height: 0; border-left: 11px solid transparent; border-right: 11px solid transparent;
+    border-top: 22px solid var(--ivory); filter: drop-shadow(0 2px 2px rgba(0,0,0,.5));
+  }
+  .wheel {
+    width: 100%; height: 100%; border-radius: 50%; border: 5px solid var(--brass);
+    box-shadow: 0 8px 20px rgba(0,0,0,.45); overflow: hidden;
+    transition: transform 4.2s cubic-bezier(.15,.6,.12,1);
+  }
+  .wheel svg { display: block; width: 100%; height: 100%; }
+  .ballresult {
+    position: absolute; left: 50%; top: 50%; width: 34%; aspect-ratio: 1; transform: translate(-50%, -50%);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2;
+    font-weight: 800; font-size: clamp(1.3rem, 6vw, 2rem); border: 4px solid var(--brass);
+    background: var(--ink); color: var(--ivory);
+  }
+  .ballresult.red { background: var(--ruby); }
+  .ballresult.black { background: var(--ink); }
+  .ballresult.green { background: #1f7a4d; }
+  @media (prefers-reduced-motion: reduce) { .wheel { transition: none; } }
+  .rgroup { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px; }
+  .rgroup button {
+    background: var(--felt-deep); color: var(--ivory);
+    border: 2px solid var(--brass); border-radius: 999px; padding: 7px 14px; font-weight: 700;
+  }
+  .rgroup button.sel { background: var(--brass); color: var(--ink); }
+  .rgrid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-bottom: 16px; }
+  .rgrid button {
+    color: var(--ivory); border: 1px solid var(--brass); border-radius: 6px;
+    padding: 8px 0; font-weight: 700; font-size: .8rem; text-align: center;
+  }
+  .rgrid button.zero { grid-column: 1 / -1; }
+  .rgrid button.n-red { background: var(--ruby); }
+  .rgrid button.n-black { background: var(--ink); }
+  .rgrid button.n-green { background: #1f7a4d; }
+  .rgrid button.sel { box-shadow: 0 0 0 3px var(--brass); transform: scale(1.12); position: relative; z-index: 1; }
+  .rgroup button:disabled, .rgrid button:disabled { opacity: .5; cursor: not-allowed; }
 
   /* admin panel */
   .notifier {
@@ -260,7 +316,10 @@
     <button id="navCredits">Credits</button>
     <button id="navPanel" hidden>Panel</button>
   </nav>
-  <div class="who" id="who"></div>
+  <div class="hright">
+    <div class="who" id="who"></div>
+    <div class="version">v1.2</div>
+  </div>
 </header>
 
 <main>
@@ -321,12 +380,67 @@
     </div>
   </section>
 
+  <!-- GAMES -->
+  <section id="viewGames" hidden>
+    <h1>Games</h1>
+    <p class="sub">Pick a game to play.</p>
+    <!-- To add a game later: copy one of the cards below and point it at the new game. -->
+    <div class="gamegrid">
+      <button class="gamecard" id="gameSlots">
+        <span class="gameicon">🎰</span>
+        <span class="gamename">Slots</span>
+        <span class="gamedesc">Match symbols to win up to ×100.</span>
+      </button>
+      <button class="gamecard" id="gameRoulette">
+        <span class="gameicon">🎡</span>
+        <span class="gamename">Roulette</span>
+        <span class="gamedesc">Bet on a color, a range, or a single number.</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ROULETTE -->
+  <section id="viewRoulette" hidden>
+    <h1>Roulette</h1>
+    <p class="sub">(These are fake chips)</p>
+
+    <div class="chipbar"><div class="chipcount"><span class="disc"></span><span id="rChips">0</span></div></div>
+
+    <div class="machine">
+      <div class="wheelwrap">
+        <div class="wheelpointer"></div>
+        <div class="wheel" id="wheel"></div>
+        <div class="ballresult" id="rBall">–</div>
+      </div>
+      <div class="message" id="rMsg">Pick what to bet on, then press "spin".</div>
+      <div class="betlabel">Betting <b id="rBetShown">10</b> chips on <b id="rPickShown">Red</b></div>
+      <div class="rgroup" id="rOutside"></div>
+      <div class="rgrid" id="rNumbers"></div>
+      <div class="betlabel">Bet amount</div>
+      <div class="bets" id="rBets"></div>
+      <button class="spin" id="rSpinBtn">SPIN</button>
+    </div>
+
+    <div class="lock" id="rLock" hidden>
+      <div>You're out of chips. 1,000 chips arrives in</div>
+      <div class="timer" id="rTimer">24:00:00</div>
+    </div>
+
+    <div class="paytable">
+      <b>Red / Black</b>, <b>Odd / Even</b>, <b>1–18 / 19–36</b> pay ×2<br>
+      <b>Dozens</b> (1st, 2nd, 3rd 12) pay ×3 &nbsp; <b>Single number</b> pays ×36<br>
+      The green <b>0</b> makes every bet except a bet on 0 itself lose.
+    </div>
+  </section>
+
   <!-- CREDITS -->
   <section id="viewCredits" hidden>
     <h1>Credits</h1>
     <div class="videowrap">
       <video id="creditsVideo" src="gamblecore.mp4" controls playsinline preload="metadata"></video>
       <div class="videoerr" id="videoErr" hidden>No way this retard forgot to put the gamblecore.mp4 video in the same folder as the .HTML 🤣🤣🤣</div>
+      <!-- Write your credits text below. Press Enter for new lines. -->
+      <p class="creditstext">Write your credits here.</p>
     </div>
   </section>
 
@@ -525,7 +639,7 @@
       });
       if (outside) caught("page");
     });
-    ["who", "viewAuth", "viewSlots", "viewBoard", "viewCredits", "viewPanel", "statsModal"].forEach(function (id) {
+    ["who", "viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewBoard", "viewCredits", "viewPanel", "statsModal"].forEach(function (id) {
       guardObs.observe($(id), { childList: true, subtree: true, attributes: true, characterData: true });
     });
     guardObs.observe(document.querySelector("header"), { childList: true, subtree: true, attributes: true, characterData: true });
@@ -571,8 +685,9 @@
   /* ---------- views ---------- */
   function show(view) {
     if (view === "viewPanel" && !isAdmin()) view = profile ? "viewSlots" : "viewAuth";
+    if ((view === "viewGames" || view === "viewRoulette") && !profile) view = "viewAuth";
     viewNow = view;
-    ["viewAuth", "viewSlots", "viewBoard", "viewCredits", "viewPanel"].forEach(function (v) { $(v).hidden = (v !== view); });
+    ["viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewBoard", "viewCredits", "viewPanel"].forEach(function (v) { $(v).hidden = (v !== view); });
     $("navSlots").classList.toggle("active", view === "viewSlots" || view === "viewAuth");
     $("navBoard").classList.toggle("active", view === "viewBoard");
     $("navCredits").classList.toggle("active", view === "viewCredits");
@@ -589,6 +704,7 @@
     if (boardTimer) { clearInterval(boardTimer); boardTimer = null; }
     if (panelTimer) { clearInterval(panelTimer); panelTimer = null; }
     if (view === "viewSlots") renderSlots();
+    if (view === "viewRoulette") renderRoulette();
     if (view === "viewBoard") {
       renderBoard();
       // Keep it fresh for everyone watching (admins skip this so typed amounts aren't wiped).
@@ -606,6 +722,8 @@
     else show("viewBoard");
   });
   on($("navCredits"), "click", function () { show("viewCredits"); });
+  on($("gameSlots"), "click", function () { show("viewSlots"); });
+  on($("gameRoulette"), "click", function () { show("viewRoulette"); });
   on($("creditsVideo"), "error", function () { $("videoErr").hidden = false; });
 
   /* ---------- admin panel: notifier ---------- */
@@ -703,6 +821,9 @@
     w.textContent = "";
     $("navPanel").hidden = !isAdmin();   // the Panel tab only exists for the admin
     if (profile) {
+      var gm = document.createElement("button");
+      gm.className = "statsbtn"; gm.textContent = "Games";
+      gm.onclick = H(function () { show("viewGames"); });
       var st = document.createElement("button");
       st.className = "statsbtn"; st.textContent = "Stats";
       st.onclick = H(openStats);
@@ -714,7 +835,7 @@
       var out = document.createElement("button");
       out.className = "linkbtn"; out.textContent = "Log out";
       out.onclick = H(logout);
-      w.appendChild(st); w.appendChild(span); w.appendChild(b); w.appendChild(out);
+      w.appendChild(gm); w.appendChild(st); w.appendChild(span); w.appendChild(b); w.appendChild(out);
     } else {
       var s = document.createElement("span");
       s.textContent = "Not signed in";
@@ -833,11 +954,15 @@
     setProfile(null);
     spinning = false;
     shownChips = null;
+    rSpinning = false;
+    rShownChips = null;
     stopTimer();
     closeStats();
     renderWho();
     $("msg").textContent = "Pick a bet and pull the lever.";
     $("msg").className = "message";
+    $("rMsg").textContent = "Pick what to bet on, then press \"spin\".";
+    $("rMsg").className = "message";
     show("viewAuth");
     refreshAuthUI();
   }
@@ -871,12 +996,18 @@
       var left = Date.parse(profile.refill_at) - Date.now();
       if (left <= 0) {
         $("timer").textContent = "00:00:00";
+        $("rTimer").textContent = "00:00:00";
         if (Date.now() - lastRefillTry > 3000) {
           lastRefillTry = Date.now();
-          syncMe().then(function () { if (profile && viewNow === "viewSlots") renderSlots(); });
+          syncMe().then(function () {
+            if (!profile) return;
+            if (viewNow === "viewSlots") renderSlots();
+            else if (viewNow === "viewRoulette") renderRoulette();
+          });
         }
       } else {
         $("timer").textContent = formatTime(left);
+        $("rTimer").textContent = formatTime(left);
       }
     }
   }
@@ -984,6 +1115,183 @@
     });
   }
   on($("spinBtn"), "click", spin);
+
+  /* ---------- roulette ---------- */
+  // European wheel: one green 0, numbers in real wheel order. The server picks the number.
+  var WHEEL_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+  var REDS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+  var OUTSIDE_BETS = [["red", "Red"], ["black", "Black"], ["odd", "Odd"], ["even", "Even"],
+                      ["low", "1-18"], ["high", "19-36"], ["dozen1", "1st 12"], ["dozen2", "2nd 12"], ["dozen3", "3rd 12"]];
+  var WHEEL_FILL = { red: "#b3262e", black: "#1b1a17", green: "#1f7a4d" };
+  var rBet = 10;
+  var rPick = { type: "red", num: null };
+  var rSpinning = false;
+  var rShownChips = null;
+  var wheelRot = 0;
+  var rPickBtns = [];
+
+  function colorOf(n) { return n === 0 ? "green" : (REDS.indexOf(n) >= 0 ? "red" : "black"); }
+  function pickLabel(pk) {
+    if (pk.type === "number") return "Number " + pk.num;
+    for (var i = 0; i < OUTSIDE_BETS.length; i++) if (OUTSIDE_BETS[i][0] === pk.type) return OUTSIDE_BETS[i][1];
+    return "";
+  }
+  function svgEl(name, attrs) {
+    var el = document.createElementNS("http://www.w3.org/2000/svg", name);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function buildWheel() {
+    var seg = 360 / 37, cx = 100, cy = 100, R = 98;
+    var svg = svgEl("svg", { viewBox: "0 0 200 200" });
+    function pt(r, deg) {
+      var a = deg * Math.PI / 180;
+      return [(cx + r * Math.sin(a)).toFixed(2), (cy - r * Math.cos(a)).toFixed(2)];
+    }
+    WHEEL_ORDER.forEach(function (n, i) {
+      var p0 = pt(R, i * seg), p1 = pt(R, (i + 1) * seg);
+      svg.appendChild(svgEl("path", {
+        d: "M" + cx + " " + cy + " L" + p0.join(" ") + " A" + R + " " + R + " 0 0 1 " + p1.join(" ") + " Z",
+        fill: WHEEL_FILL[colorOf(n)], stroke: "#d8a94b", "stroke-width": "0.4"
+      }));
+      var t = svgEl("text", {
+        x: "100", y: "22", "text-anchor": "middle", "font-size": "8", "font-weight": "700", fill: "#f5efe0",
+        transform: "rotate(" + ((i + 0.5) * seg).toFixed(2) + " 100 100)"
+      });
+      t.textContent = String(n);
+      svg.appendChild(t);
+    });
+    svg.appendChild(svgEl("circle", { cx: "100", cy: "100", r: "58", fill: "#0a2a20", stroke: "#d8a94b", "stroke-width": "2" }));
+    $("wheel").appendChild(svg);
+  }
+  function addPickBtn(parent, label, type, numVal, cls) {
+    var b = document.createElement("button");
+    b.textContent = label;
+    b.onclick = H(function () {
+      if (rSpinning) return;
+      rPick = { type: type, num: numVal };
+      renderRoulette();
+    });
+    parent.appendChild(b);
+    rPickBtns.push({ el: b, type: type, num: numVal, base: cls || "" });
+  }
+  function buildRPicks() {
+    OUTSIDE_BETS.forEach(function (o) { addPickBtn($("rOutside"), o[1], o[0], null, ""); });
+    addPickBtn($("rNumbers"), "0", "number", 0, "zero n-green");
+    [3, 2, 1].forEach(function (row) {
+      for (var c = 0; c < 12; c++) {
+        var n = c * 3 + row;
+        addPickBtn($("rNumbers"), String(n), "number", n, "n-" + colorOf(n));
+      }
+    });
+  }
+  buildWheel();
+  buildRPicks();
+
+  function buildRBets() {
+    var box = $("rBets");
+    box.textContent = "";
+    var chips = profile ? profile.chips : 0;
+    BET_OPTIONS.concat(["MAX"]).forEach(function (opt) {
+      var btn = document.createElement("button");
+      var val = opt === "MAX" ? chips : opt;
+      btn.textContent = opt === "MAX" ? "All in" : String(opt);
+      btn.disabled = rSpinning || chips <= 0 || (opt !== "MAX" && opt > chips);
+      if ((opt === "MAX" && rBet === chips && chips > 0 && BET_OPTIONS.indexOf(chips) === -1) || (opt !== "MAX" && opt === rBet)) {
+        btn.className = "sel";
+      }
+      btn.onclick = H(function () { rBet = val; buildRBets(); $("rBetShown").textContent = rBet; });
+      box.appendChild(btn);
+    });
+  }
+
+  function renderRoulette() {
+    var m = profile;
+    if (!m) return;
+    var shown = (rSpinning && rShownChips !== null) ? rShownChips : m.chips;
+    $("rChips").textContent = shown.toLocaleString();
+    if (!rSpinning) {
+      if (rBet > m.chips) rBet = Math.max(0, m.chips);
+      if (m.chips > 0 && rBet === 0) rBet = Math.min(10, m.chips);
+    }
+    $("rBetShown").textContent = rBet;
+    $("rPickShown").textContent = pickLabel(rPick);
+    var broke = !rSpinning && m.chips <= 0;
+    $("rLock").hidden = !broke;
+    $("rSpinBtn").disabled = rSpinning || broke;
+    rPickBtns.forEach(function (pb) {
+      var sel = pb.type === rPick.type && pb.num === rPick.num;
+      pb.el.className = (pb.base + (sel ? " sel" : "")).trim();
+      pb.el.disabled = rSpinning || broke;
+    });
+    buildRBets();
+    stopTimer();
+    if (broke) { tick(); timerHandle = every(tick, 500); }
+  }
+
+  function rSpin() {
+    if (rSpinning || !profile) return;
+    if (profile.chips <= 0) { renderRoulette(); return; }
+    if (rBet <= 0 || rBet > profile.chips) rBet = Math.min(10, profile.chips);
+
+    var wager = rBet;
+    var pick = { type: rPick.type, num: rPick.num };
+    rSpinning = true;
+    rShownChips = profile.chips - wager;
+    $("rChips").textContent = rShownChips.toLocaleString();
+    $("rSpinBtn").disabled = true;
+    buildRBets();
+    rPickBtns.forEach(function (pb) { pb.el.disabled = true; });
+    $("rMsg").className = "message";
+    $("rMsg").textContent = "No more bets...";
+    $("rBall").className = "ballresult";
+    $("rBall").textContent = "...";
+
+    var args = { p_bet: wager, p_type: pick.type };
+    if (pick.type === "number") args.p_pick = pick.num;
+
+    // The server picks the number and does the chip math the moment this call runs.
+    rpc("roulette_spin", args).then(function (res) {
+      var n = num(res.result);
+      var idx = WHEEL_ORDER.indexOf(n);
+      var seg = 360 / 37;
+      var desired = (360 - (idx + 0.5) * seg + 360) % 360;
+      var cur = ((wheelRot % 360) + 360) % 360;
+      wheelRot += 360 * 5 + ((desired - cur + 360) % 360);
+      $("wheel").style.transform = "rotate(" + wheelRot + "deg)";
+
+      later(function () {
+        rSpinning = false;
+        rShownChips = null;
+        setProfile(res.profile);
+        var color = colorOf(n);
+        var payout = num(res.payout);
+        $("rBall").className = "ballresult " + color;
+        $("rBall").textContent = String(n);
+        var msg = $("rMsg");
+        var what = "It landed on " + n + " (" + color + "). ";
+        if (res.win) {
+          msg.className = "message win";
+          msg.textContent = what + "You win " + payout.toLocaleString() + " chips!";
+        } else {
+          msg.className = "message lose";
+          msg.textContent = what + ((profile.chips <= 0) ? "That was your last chip." : "You lose " + wager + " chips.");
+        }
+        if (viewNow === "viewRoulette") renderRoulette();
+      }, 4500);
+    }).catch(function (e) {
+      rSpinning = false;
+      rShownChips = null;
+      $("rBall").textContent = "–";
+      $("rMsg").className = "message lose";
+      $("rMsg").textContent = /not_signed_in|no_profile/i.test(e.message || "")
+        ? "Your session ended. Please log in again."
+        : (/roulette_spin/i.test(e.message || "") ? "Roulette isn't set up on the server yet. Run roulette.sql in Supabase."
+                                                    : "That spin didn't go through. Try again.");
+      syncMe().then(function () { if (profile && viewNow === "viewRoulette") renderRoulette(); });
+    });
+  }
+  on($("rSpinBtn"), "click", rSpin);
 
   /* ---------- leaderboard ---------- */
   var toastHandle = null;
