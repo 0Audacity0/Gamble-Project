@@ -293,6 +293,18 @@
     background: rgba(216,169,75,.18); border: 2px solid var(--brass); border-radius: 12px;
   }
   .susptag { color: #f3d9a4; font-weight: 800; margin-left: 6px; }
+  .lucktag { color: #f3d27a; font-weight: 800; margin-left: 6px; }
+  .lucktag.neg { color: #b9d0ff; }
+  .luckform { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .luckform select, .luckform input {
+    width: auto; flex: 1 1 140px; padding: 10px; font: inherit; border-radius: 8px;
+    border: 2px solid transparent; background: var(--ivory); color: var(--ink);
+  }
+  .luckform input { flex: 0 1 100px; }
+  .luckform button {
+    border: 2px solid var(--brass); background: var(--brass); color: var(--ink);
+    border-radius: 8px; padding: 9px 18px; font-weight: 800;
+  }
   .admincell button.susp { border-color: #8fb4ff; color: #b9d0ff; }
   .admincell button.susp:hover { background: #2a4a8a; color: var(--ivory); }
   .panelfoot {
@@ -336,7 +348,7 @@
   </nav>
   <div class="hright">
     <div class="who" id="who"></div>
-    <div class="version">v1.6</div>
+    <div class="version">v1.7</div>
   </div>
 </header>
 
@@ -499,6 +511,34 @@
       <div class="toolrow">
         <button id="toolPurge">Clean up old test accounts</button>
       </div>
+    </div>
+
+    <div class="notifier panelgap">
+      <div class="notifhead"><h2>Luck modifier</h2></div>
+      <div class="note" style="margin:0 0 8px">Pick a player, how lucky or unlucky they are, and for how long. On every slots or roulette spin the server rolls extra times and keeps the best result (lucky) or the worst result (unlucky). Players aren't told. You see a tag next to them on the Leaderboard.</div>
+      <div class="luckform">
+        <select id="luckPlayer" aria-label="Player"></select>
+        <select id="luckLevel" aria-label="Luck level">
+          <option value="5">+5 Insanely lucky (best of 6 tries)</option>
+          <option value="4">+4 Very lucky (best of 5 tries)</option>
+          <option value="3" selected>+3 Lucky (best of 4 tries)</option>
+          <option value="2">+2 Slightly lucky (best of 3 tries)</option>
+          <option value="1">+1 A little lucky (best of 2 tries)</option>
+          <option value="-1">-1 A little unlucky (worst of 2 tries)</option>
+          <option value="-2">-2 Slightly unlucky (worst of 3 tries)</option>
+          <option value="-3">-3 Unlucky (worst of 4 tries)</option>
+          <option value="-4">-4 Very unlucky (worst of 5 tries)</option>
+          <option value="-5">-5 Cursed (worst of 6 tries)</option>
+        </select>
+        <input id="luckAmount" type="number" min="1" step="1" value="1" aria-label="How long">
+        <select id="luckUnit" aria-label="Time unit">
+          <option value="1">minutes</option>
+          <option value="60" selected>hours</option>
+          <option value="1440">days</option>
+        </select>
+        <button id="luckApply">Apply</button>
+      </div>
+      <ul class="feed" id="luckList"></ul>
     </div>
 
     <div class="notifier panelgap">
@@ -771,7 +811,7 @@
     sus: "Nobody looks suspicious right now."
   };
   var OV_TILES = [["players", "Players"], ["tests", "Test accounts"], ["chips", "Chips in play"], ["out_of_chips", "Out of chips"],
-                  ["flagged", "Flagged cheaters"], ["suspended", "Suspended"], ["new_24h", "New accounts today"],
+                  ["flagged", "Flagged cheaters"], ["suspended", "Suspended"], ["lucky", "Luck modifiers"], ["new_24h", "New accounts today"],
                   ["cheats_24h", "Cheats today"], ["jackpots", "Jackpots won"], ["spent", "Chips spent"]];
 
   on($("navPanel"), "click", function () {
@@ -798,6 +838,7 @@
     panelSeen = num(load(PANEL_SEEN_KEY, 0));
     save(PANEL_SEEN_KEY, Date.now());
     renderPanel();
+    renderLuck(true);
     rpc("get_announcement").then(function (t) { $("annText").value = (typeof t === "string") ? t : ""; }).catch(function () {});
     panelTimer = every(function () { if (viewNow === "viewPanel") renderPanel(); }, 5000);
   }
@@ -837,6 +878,7 @@
     if (!isAdmin() || !sb) return;
     var tabNow = panelTab;
     renderOverview();
+    renderLuck(false);
     var job = (tabNow === "sus")
       ? rpc("admin_suspicious")
       : rpc("admin_get_events", { p_kind: tabNow, p_limit: 100 });
@@ -918,6 +960,91 @@
       feed.appendChild(li);
     });
   }
+
+  function fmtLeft(untilStr) {
+    var ms = Date.parse(untilStr) - Date.now();
+    if (!isFinite(ms) || ms <= 0) return "ending now";
+    var m = Math.ceil(ms / 60000);
+    if (m < 60) return m + " min left";
+    var h = Math.floor(m / 60);
+    if (h < 48) return h + "h " + (m % 60) + "m left";
+    return Math.floor(h / 24) + "d " + (h % 24) + "h left";
+  }
+  function luckStr(n) { return "LUCK " + (n > 0 ? "+" : "") + n; }
+  function renderLuck(refillSelect) {
+    rpc("get_leaderboard").then(function (rows) {
+      if (viewNow !== "viewPanel") return;
+      rows = rows || [];
+      if (refillSelect) {
+        var sel = $("luckPlayer");
+        var keep = sel.value;
+        sel.textContent = "";
+        rows.forEach(function (r) {
+          var o = document.createElement("option");
+          o.value = r.id;
+          o.textContent = r.username + (r.is_me ? " (you)" : "");
+          sel.appendChild(o);
+        });
+        if (keep) sel.value = keep;
+      }
+      var list = $("luckList");
+      list.textContent = "";
+      var lucky = rows.filter(function (r) { return num(r.luck_level) !== 0; });
+      if (!lucky.length) {
+        var li0 = document.createElement("li");
+        li0.className = "feedempty";
+        li0.textContent = "Nobody has a luck modifier right now.";
+        list.appendChild(li0);
+        return;
+      }
+      lucky.forEach(function (r) {
+        var lvl = num(r.luck_level);
+        var li = document.createElement("li");
+        li.className = "feeditem";
+        var left = document.createElement("div");
+        var name = document.createElement("span");
+        name.className = "feedname"; name.textContent = r.username;
+        var pill = document.createElement("span");
+        pill.className = lvl > 0 ? "pill win" : "pill bad";
+        pill.textContent = luckStr(lvl);
+        var why = document.createElement("div");
+        why.className = "feedwhy"; why.textContent = fmtLeft(r.luck_until);
+        left.appendChild(name); left.appendChild(pill); left.appendChild(why);
+        var right = document.createElement("div");
+        right.className = "admincell";
+        var rm = document.createElement("button");
+        rm.className = "del"; rm.textContent = "Remove";
+        rm.onclick = H(function () {
+          rpc("admin_set_luck", { p_id: r.id, p_level: 0, p_minutes: 0 }).then(function () {
+            ptoast("Removed the luck modifier from " + r.username + ".");
+            renderLuck(false);
+          }).catch(function () { ptoast("That didn't go through."); });
+        });
+        right.appendChild(rm);
+        li.appendChild(left); li.appendChild(right);
+        list.appendChild(li);
+      });
+    }).catch(function () {
+      if (viewNow !== "viewPanel") return;
+      $("luckList").textContent = "Couldn't load players. Did you run admin_upgrade.sql in Supabase?";
+    });
+  }
+  on($("luckApply"), "click", function () {
+    if (!isAdmin()) return;
+    var sel = $("luckPlayer");
+    if (!sel.value) { ptoast("Pick a player first."); return; }
+    var who = sel.options[sel.selectedIndex].textContent;
+    var lvl = Math.floor(Number($("luckLevel").value));
+    var mins = Math.floor(Number($("luckAmount").value)) * Math.floor(Number($("luckUnit").value));
+    if (!isFinite(mins) || mins < 1) { ptoast("Enter how long it should last."); return; }
+    mins = Math.min(mins, 43200);
+    rpc("admin_set_luck", { p_id: sel.value, p_level: lvl, p_minutes: mins }).then(function () {
+      ptoast(who + " now has " + luckStr(lvl) + " for " + mins.toLocaleString() + " minute" + (mins === 1 ? "" : "s") + ".");
+      renderLuck(false);
+    }).catch(function (e) {
+      ptoast(/not_admin/.test(e.message || "") ? "Only the admin can do that." : "That didn't go through. Did you run admin_upgrade.sql?");
+    });
+  });
 
   function fetchAnnouncement() {
     if (!sb) return;
@@ -1535,6 +1662,13 @@
           var tag = document.createElement("span");
           tag.className = "cheater"; tag.textContent = "CHEATER";
           td.appendChild(tag);
+        }
+        if (idx === 1 && admin && num(r.luck_level) !== 0) {
+          var ltag = document.createElement("span");
+          ltag.className = "lucktag" + (num(r.luck_level) < 0 ? " neg" : "");
+          ltag.textContent = luckStr(num(r.luck_level));
+          ltag.title = fmtLeft(r.luck_until);
+          td.appendChild(ltag);
         }
         if (idx === 1 && admin && r.suspended) {
           var stag = document.createElement("span");
