@@ -455,8 +455,8 @@
       </button>
       <button class="gamecard" id="gamePoker">
         <span class="gamename">Poker</span>
-        <span class="gameicon">🃏</span>
-        <span class="gamedesc">Texas Hold'em against 3 bots that are dumb as rocks. Fixed bet sizes, so nobody can go all-in.</span>
+        <span class="gameicon">🤯</span>
+        <span class="gamedesc">Basically just poker.</span>
       </button>
     </div>
   </section>
@@ -526,9 +526,7 @@
     </div>
 
     <div class="paytable">
-      Everybody antes, then you bet before the flop, on the flop, on the turn and on the river.<br>
-      A bet is the ante size before the flop and on the flop, and double on the turn and river. 3 bets max per round.<br>
-      Best 5-card hand wins. You need <b>19 times the ante</b> in chips to sit down, so nobody ever goes all-in.
+      I HAVE NO CLUE WHAT TO PUT HERE 🗣️🔥🔥🔥🔥<br>
     </div>
   </section>
 
@@ -1864,7 +1862,7 @@
     seatsBox.textContent = "";
     for (var i = 1; i <= 3; i++) {
       var d = document.createElement("div");
-      pFill(d, st ? st.seats[i] : { name: ["", "Rocky", "Pebbles", "Boulder"][i], folded: false, contrib: 0, cards: null, hand: null }, i, st);
+      pFill(d, st ? st.seats[i] : { name: ["", "Bot 1", "Bot 2", "Bot 3"][i], folded: false, contrib: 0, cards: null, hand: null }, i, st);
       if (!st) d.querySelector(".pcards").textContent = "";
       seatsBox.appendChild(d);
     }
