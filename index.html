@@ -1965,7 +1965,7 @@
       $("pDealBtn").disabled = pBusy || broke || poor || m.chips < pAnte * 19;
       if (st && st.over && !pBusy) { var r = pResult(st); pMsg(r[0], r[1]); }
       else if (!st && !pBusy) pMsg("", "Pick an ante and deal a hand.");
-      if (poor && !pBusy) pMsg("lose", "You need at least " + (P_ANTES[0] * 19) + " chips to sit at the poker table.");
+      if (poor && !pBusy) pMsg("lose", "You need at least " + (P_ANTES[0] * 19) + " chips to play poker.");
     }
     if (pNote && !pBusy) pMsg("lose", pNote);
     var log = $("pLog");
