@@ -1214,7 +1214,7 @@
     locked = !!v;
     var note = $("lockNotice");
     var wantHidden = !locked;
-    var text = "Locked: only the admin can log in right now. Sign ups are turned off.";
+    var text = "Under Maintenance: You've been logged out temporarily and cannot log back in until maintenance is over.";
     if (note.hidden !== wantHidden) note.hidden = wantHidden;
     if (note.textContent !== text) note.textContent = text;
     $("lockState").textContent = locked ? "ON - everybody else is locked out" : "OFF";
