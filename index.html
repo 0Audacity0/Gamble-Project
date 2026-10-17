@@ -376,7 +376,7 @@
   </nav>
   <div class="hright">
     <div class="who" id="who"></div>
-    <div class="version">v1.8</div>
+    <div class="version">v1.8.1</div>
   </div>
 </header>
 
@@ -387,6 +387,7 @@
     <h1>STRAIGHT Gambling (with no consequences!!!!!!)</h1>
     <p class="sub">(no you don't have to pay anything this is just like those double it or nothing videos)</p>
     <div class="notice" id="authNotice" role="alert" hidden></div>
+    <div class="notice" id="lockNotice" role="status" hidden></div>
     <div class="card">
       <div class="tabs" role="tablist">
         <button id="tabLogin" class="active" role="tab">Log in</button>
@@ -454,8 +455,8 @@
         <span class="gamedesc">Bet on a color, a range, or a single number. If you don't understand this then please watch a tutorial.</span>
       </button>
       <button class="gamecard" id="gamePoker">
-        <span class="gamename">Poker</span>
         <span class="gameicon">🤯</span>
+        <span class="gamename">Poker</span>
         <span class="gamedesc">Basically just poker.</span>
       </button>
     </div>
@@ -643,6 +644,17 @@
       </div>
       <ul class="feed" id="feed"></ul>
     </div>
+
+    <div class="notifier panelgap" id="lockCard">
+      <div class="notifhead">
+        <h2>Lockdown</h2>
+        <span class="notifstamp" id="lockState">Checking...</span>
+      </div>
+      <div class="note" style="margin:0 0 4px">Turning this on logs everybody out (except you) and stops anyone from logging in or signing up until you turn it off again. Players who are on the game get kicked within a few seconds.</div>
+      <div class="toolrow">
+        <button id="lockToggle" class="dangerbtn">Log everybody out and lock the game</button>
+      </div>
+    </div>
     <div class="panelfoot">
       <a class="dashbtn" href="https://supabase.com/dashboard/project/roaqfrcbcwwloohrjjzm" target="_blank" rel="noopener">Open Supabase dashboard</a>
     </div>
@@ -689,6 +701,9 @@
   var busy = false;
   var guardObs = null;
   var tampering = false;
+  var locked = false;      // lockdown switch, kept in Supabase
+  var lockKick = false;
+  var LOCK_MSG = "The game is locked right now. Nobody can log in or sign up until the admin unlocks it.";
 
   var isAdmin = function () { return !!(profile && profile.is_admin); };
 
@@ -809,12 +824,16 @@
 
   function rpc(name, args) {
     return guarded(sb.rpc(name, args || {}).then(function (r) {
-      if (r.error) throw new Error(r.error.message || "Server error");
+      if (r.error) {
+        if (/game_locked/i.test(r.error.message || "")) fetchLock();
+        throw new Error(r.error.message || "Server error");
+      }
       return r.data;
     }));
   }
   function friendly(e) {
     var m = (e && e.message) ? e.message : String(e);
+    if (/game_locked/i.test(m)) return LOCK_MSG;
     if (/username_taken|already registered|already been registered/i.test(m)) return "That username is taken.";
     if (/invalid login/i.test(m)) return "Wrong username or password.";
     if (/anonymous/i.test(m)) return "Test accounts need \"Anonymous sign-ins\" turned on in Supabase (Authentication > Sign In / Providers).";
@@ -928,6 +947,7 @@
     save(PANEL_SEEN_KEY, Date.now());
     renderPanel();
     renderLuck(true);
+    fetchLock();
     rpc("get_announcement").then(function (t) { $("annText").value = (typeof t === "string") ? t : ""; }).catch(function () {});
     panelTimer = every(function () { if (viewNow === "viewPanel") renderPanel(); }, 5000);
   }
@@ -1185,6 +1205,52 @@
     toolRun("admin_delete", { p_id: t.id }, "Deleted " + t.name + "'s account.", true);
   });
 
+  /* ---------- lockdown ---------- */
+  function fetchLock() {
+    if (!sb) return guarded(Promise.resolve());
+    return rpc("get_lockdown").then(function (v) { applyLock(v === true); }).catch(function () {});
+  }
+  function applyLock(v) {
+    locked = !!v;
+    var note = $("lockNotice");
+    var wantHidden = !locked;
+    var text = "Locked: only the admin can log in right now. Sign ups are turned off.";
+    if (note.hidden !== wantHidden) note.hidden = wantHidden;
+    if (note.textContent !== text) note.textContent = text;
+    $("lockState").textContent = locked ? "ON - everybody else is locked out" : "OFF";
+    var btn = $("lockToggle");
+    btn.textContent = locked ? "Unlock: let people log in and sign up again" : "Log everybody out and lock the game";
+    btn.classList.toggle("dangerbtn", !locked);
+    $("navPanel").textContent = locked ? "Panel \uD83D\uDD12" : "Panel";
+    if (locked && profile && !isAdmin()) lockOut();
+  }
+  // Logs the current player out because of the lockdown (test accounts are deleted, like a normal log out).
+  function lockOut() {
+    if (lockKick) return;
+    lockKick = true;
+    var wasTest = !!(profile && profile.is_test);
+    var first = wasTest ? rpc("delete_test_account").catch(function () {}) : guarded(Promise.resolve());
+    first.then(function () {
+      return guarded(sb.auth.signOut({ scope: "local" }));
+    }).catch(function () {}).then(function () {
+      if (wasTest) $("user").value = "";
+      resetToLoggedOut();
+      err(LOCK_MSG);
+      lockKick = false;
+    });
+  }
+  on($("lockToggle"), "click", function () {
+    if (!isAdmin()) return;
+    var turnOn = !locked;
+    if (turnOn && !window.confirm("Log everybody out and stop anyone from logging in or signing up until you unlock it? Only your admin account stays in.")) return;
+    rpc("admin_set_lockdown", { p_on: turnOn }).then(function () {
+      applyLock(turnOn);
+      ptoast(turnOn ? "Locked. Everybody else is being logged out." : "Unlocked. People can log in and sign up again.");
+    }).catch(function (e) {
+      ptoast(/not_admin/.test(e.message || "") ? "Only the admin can do that." : "That didn't go through. Did you run lockdown.sql in Supabase?");
+    });
+  });
+
   function fetchAnnouncement() {
     if (!sb) return;
     rpc("get_announcement").then(function (t) {
@@ -1304,11 +1370,21 @@
 
   function submitAuth() {
     if (busy) return;
+    if (!sb) { doAuth(); return; }
+    setBusy(true);
+    fetchLock().then(function () { setBusy(false); doAuth(); });
+  }
+  function doAuth() {
+    if (busy) return;
     if (!sb) { err("Couldn't load Supabase. Check your internet connection and reload."); return; }
     var name = $("user").value.trim();
     var pw = $("pass").value;
     err("");
     var job;
+
+    // Lockdown: only the admin may get in. The admin can't be told apart by name here,
+    // so normal log ins go through and non-admins are kicked straight out in afterLogin().
+    if (locked && (mode === "signup" || isGuestName(name) || isNebName(name))) { err(LOCK_MSG); return; }
 
     if (isNebName(name)) {
       setBusy(true);
@@ -1368,6 +1444,7 @@
 
   function afterLogin(p) {
     setProfile(p);
+    if (locked && !p.is_admin) { lockOut(); return; }
     if (!p.is_test && !p.is_admin) setCookie("luckyslots_last_user", p.username, 365);
     $("pass").value = ""; $("pass2").value = "";
     $("authNotice").hidden = true;
@@ -2166,6 +2243,8 @@
       startGuard();
       fetchAnnouncement();
       every(fetchAnnouncement, 60000);
+      fetchLock();
+      every(fetchLock, 5000);
       if (snapBad && profile) caught("storage");
     });
   })();
