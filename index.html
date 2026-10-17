@@ -292,6 +292,34 @@
     margin: 0 0 18px; padding: 12px 16px; text-align: center; font-weight: 700; white-space: pre-line;
     background: rgba(216,169,75,.18); border: 2px solid var(--brass); border-radius: 12px;
   }
+  .pokertable { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .pseats { display: flex; gap: 10px; width: 100%; justify-content: center; flex-wrap: wrap; }
+  .pseat { flex: 1 1 90px; max-width: 170px; background: rgba(0,0,0,.28); border: 2px solid rgba(216,169,75,.35); border-radius: 12px; padding: 8px; text-align: center; }
+  .pseat.win { border-color: #f3d27a; box-shadow: 0 0 0 2px #f3d27a; }
+  .pseat.out { opacity: .45; }
+  .pname { font-weight: 800; }
+  .pinfo { font-size: .8rem; color: var(--muted); min-height: 1.1em; }
+  .pcards { display: flex; gap: 4px; justify-content: center; margin-top: 6px; }
+  .pcard {
+    width: 38px; height: 54px; border-radius: 6px; background: var(--ivory); color: var(--ink);
+    font-weight: 800; font-size: .95rem; display: flex; align-items: center; justify-content: center; border: 1px solid #bbb;
+  }
+  .pcard.red { color: #b3262e; }
+  .pcard.back { background: repeating-linear-gradient(45deg, #7a1c24, #7a1c24 4px, #5e151b 4px, #5e151b 8px); border: 2px solid var(--ivory); }
+  .pcard.empty { background: rgba(0,0,0,.25); border: 1px dashed rgba(245,239,224,.4); }
+  .pboard { display: flex; gap: 6px; justify-content: center; }
+  .pboard .pcard { width: 46px; height: 64px; font-size: 1.1rem; }
+  .ppot { font-weight: 800; color: var(--brass); }
+  .pyou { width: 100%; max-width: 260px; }
+  .pyou .pcard { width: 52px; height: 72px; font-size: 1.2rem; }
+  .pacts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 10px 0; }
+  .pacts button { padding: 10px 18px; font-weight: 800; border-radius: 10px; border: 2px solid var(--brass); background: var(--felt-deep); color: var(--ivory); }
+  .pacts button.pfold { border-color: #b3262e; }
+  .pacts button:disabled { opacity: .45; cursor: not-allowed; }
+  .plog { list-style: none; margin: 10px 0 0; padding: 0; font-size: .85rem; color: var(--muted); max-height: 9em; overflow: auto; }
+  .luckform button.alt { background: var(--felt-deep); color: var(--ivory); }
+  .toolrow button.dangerbtn { border-color: #b3262e; color: #ffb4ae; }
+  .toolrow button.dangerbtn:hover { background: #7a1c24; color: var(--ivory); }
   .susptag { color: #f3d9a4; font-weight: 800; margin-left: 6px; }
   .lucktag { color: #f3d27a; font-weight: 800; margin-left: 6px; }
   .lucktag.neg { color: #b9d0ff; }
@@ -425,6 +453,11 @@
         <span class="gamename">Roulette</span>
         <span class="gamedesc">Bet on a color, a range, or a single number. If you don't understand this then please watch a tutorial.</span>
       </button>
+      <button class="gamecard" id="gamePoker">
+        <span class="gamename">Poker</span>
+        <span class="gameicon">🃏</span>
+        <span class="gamedesc">Texas Hold'em against 3 bots that are dumb as rocks. Fixed bet sizes, so nobody can go all-in.</span>
+      </button>
     </div>
   </section>
 
@@ -458,6 +491,44 @@
       <b>Red / Black</b>, <b>Odd / Even</b>, <b>1–18 / 19–36</b> pay ×2<br>
       <b>Dozens</b> (1st, 2nd, 3rd 12) pay ×3 &nbsp; <b>Single number</b> pays ×36<br>
       The green <b>0</b> makes every bet except a bet on 0 itself lose.
+    </div>
+  </section>
+
+  <section id="viewPoker" hidden>
+    <h1>Poker</h1>
+    <p class="sub">(Texas Hold'em vs 3 bots, still fake chips)</p>
+
+    <div class="chipbar"><div class="chipcount"><span class="disc"></span><span id="pChips">0</span></div></div>
+
+    <div class="machine">
+      <div class="pokertable">
+        <div class="pseats" id="pSeats"></div>
+        <div class="pboard" id="pBoard"></div>
+        <div class="ppot">Pot: <span id="pPot">0</span></div>
+        <div class="pyou pseat" id="pYou"></div>
+      </div>
+      <div class="message" id="pMsg">Pick an ante and deal a hand.</div>
+
+      <div id="pActBox" hidden>
+        <div class="pacts" id="pActs"></div>
+      </div>
+      <div id="pDealBox">
+        <div class="betlabel">Ante: <b id="pAnteShown">10</b> chips</div>
+        <div class="bets" id="pAntes"></div>
+        <button class="spin" id="pDealBtn">DEAL</button>
+      </div>
+      <ul class="plog" id="pLog"></ul>
+    </div>
+
+    <div class="lock" id="pLock" hidden>
+      <div>You're out of chips. 1,000 chips arrives in</div>
+      <div class="timer" id="pTimer">24:00:00</div>
+    </div>
+
+    <div class="paytable">
+      Everybody antes, then you bet before the flop, on the flop, on the turn and on the river.<br>
+      A bet is the ante size before the flop and on the flop, and double on the turn and river. 3 bets max per round.<br>
+      Best 5-card hand wins. You need <b>19 times the ante</b> in chips to sit down, so nobody ever goes all-in.
     </div>
   </section>
 
@@ -539,6 +610,24 @@
         <button id="luckApply">Apply</button>
       </div>
       <ul class="feed" id="luckList"></ul>
+    </div>
+
+    <div class="notifier panelgap">
+      <div class="notifhead"><h2>Account tools</h2></div>
+      <div class="note" style="margin:0 0 8px">Pick a player, then give or take chips, put the cheater title on them (or take it off), or delete their account.</div>
+      <div class="luckform">
+        <select id="toolPlayer" aria-label="Player"></select>
+      </div>
+      <div class="luckform" style="margin-top:8px">
+        <input id="toolChips" type="number" min="1" step="1" value="1000" aria-label="Chips">
+        <button id="toolGive">Give chips</button>
+        <button id="toolTake" class="alt">Take chips</button>
+      </div>
+      <div class="toolrow">
+        <button id="toolCheater">Put cheater title</button>
+        <button id="toolPardon">Remove cheater title</button>
+        <button id="toolDelete" class="dangerbtn">Delete account</button>
+      </div>
     </div>
 
     <div class="notifier panelgap">
@@ -711,7 +800,7 @@
       });
       if (outside) caught("page");
     });
-    ["who", "viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewBoard", "viewCredits", "viewPanel", "statsModal"].forEach(function (id) {
+    ["who", "viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewPoker", "viewBoard", "viewCredits", "viewPanel", "statsModal"].forEach(function (id) {
       guardObs.observe($(id), { childList: true, subtree: true, attributes: true, characterData: true });
     });
     guardObs.observe(document.querySelector("header"), { childList: true, subtree: true, attributes: true, characterData: true });
@@ -755,9 +844,9 @@
 
   function show(view) {
     if (view === "viewPanel" && !isAdmin()) view = profile ? "viewSlots" : "viewAuth";
-    if ((view === "viewGames" || view === "viewRoulette") && !profile) view = "viewAuth";
+    if ((view === "viewGames" || view === "viewRoulette" || view === "viewPoker") && !profile) view = "viewAuth";
     viewNow = view;
-    ["viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewBoard", "viewCredits", "viewPanel"].forEach(function (v) { $(v).hidden = (v !== view); });
+    ["viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewPoker", "viewBoard", "viewCredits", "viewPanel"].forEach(function (v) { $(v).hidden = (v !== view); });
     $("navBoard").classList.toggle("active", view === "viewBoard");
     $("navCredits").classList.toggle("active", view === "viewCredits");
     $("navPanel").classList.toggle("active", view === "viewPanel");
@@ -774,6 +863,7 @@
     if (panelTimer) { clearInterval(panelTimer); panelTimer = null; }
     if (view === "viewSlots") renderSlots();
     if (view === "viewRoulette") renderRoulette();
+    if (view === "viewPoker") { renderPoker(); if (!pLoaded) pLoadState(); }
     if (view === "viewBoard") {
       renderBoard();
 
@@ -789,6 +879,7 @@
   on($("navCredits"), "click", function () { show("viewCredits"); });
   on($("gameSlots"), "click", function () { show("viewSlots"); });
   on($("gameRoulette"), "click", function () { show("viewRoulette"); });
+  on($("gamePoker"), "click", function () { show("viewPoker"); });
   on($("creditsVideo"), "error", function () { $("videoErr").hidden = false; });
 
   var PANEL_SEEN_KEY = "luckyslots_panelseen_v1";
@@ -976,16 +1067,18 @@
       if (viewNow !== "viewPanel") return;
       rows = rows || [];
       if (refillSelect) {
-        var sel = $("luckPlayer");
-        var keep = sel.value;
-        sel.textContent = "";
-        rows.forEach(function (r) {
-          var o = document.createElement("option");
-          o.value = r.id;
-          o.textContent = r.username + (r.is_me ? " (you)" : "");
-          sel.appendChild(o);
+        ["luckPlayer", "toolPlayer"].forEach(function (selId) {
+          var sel = $(selId);
+          var keep = sel.value;
+          sel.textContent = "";
+          rows.forEach(function (r) {
+            var o = document.createElement("option");
+            o.value = r.id;
+            o.textContent = r.username + (r.is_me ? " (you)" : "");
+            sel.appendChild(o);
+          });
+          if (keep) sel.value = keep;
         });
-        if (keep) sel.value = keep;
       }
       var list = $("luckList");
       list.textContent = "";
@@ -1046,6 +1139,54 @@
     });
   });
 
+  function toolTarget() {
+    var sel = $("toolPlayer");
+    if (!sel.value) { ptoast("Pick a player first."); return null; }
+    return { id: sel.value, name: sel.options[sel.selectedIndex].textContent.replace(/ \(you\)$/, "") };
+  }
+  function toolRun(fn, args, doneText, refillPlayers) {
+    rpc(fn, args).then(function () {
+      ptoast(doneText);
+      renderLuck(!!refillPlayers);
+      renderPanel();
+    }).catch(function (e) {
+      ptoast(/not_admin/.test(e.message || "") ? "Only the admin can do that." : "That didn't go through.");
+    });
+  }
+  function toolChipAmount() {
+    var n = Math.floor(Number($("toolChips").value));
+    if (!isFinite(n) || n < 1) { ptoast("Enter how many chips."); return 0; }
+    return Math.min(n, 1000000000000);
+  }
+  on($("toolGive"), "click", function () {
+    if (!isAdmin()) return;
+    var t = toolTarget(); if (!t) return;
+    var n = toolChipAmount(); if (!n) return;
+    toolRun("admin_adjust", { p_id: t.id, p_delta: n }, "Gave " + t.name + " " + n.toLocaleString() + " chips.", false);
+  });
+  on($("toolTake"), "click", function () {
+    if (!isAdmin()) return;
+    var t = toolTarget(); if (!t) return;
+    var n = toolChipAmount(); if (!n) return;
+    toolRun("admin_adjust", { p_id: t.id, p_delta: -n }, "Took " + n.toLocaleString() + " chips from " + t.name + ".", false);
+  });
+  on($("toolCheater"), "click", function () {
+    if (!isAdmin()) return;
+    var t = toolTarget(); if (!t) return;
+    toolRun("admin_flag_cheater", { p_id: t.id }, t.name + " now has the CHEATER title for 2 days.", false);
+  });
+  on($("toolPardon"), "click", function () {
+    if (!isAdmin()) return;
+    var t = toolTarget(); if (!t) return;
+    toolRun("admin_pardon", { p_id: t.id }, "Removed the cheater title from " + t.name + ".", false);
+  });
+  on($("toolDelete"), "click", function () {
+    if (!isAdmin()) return;
+    var t = toolTarget(); if (!t) return;
+    if (!window.confirm("Delete " + t.name + "'s account forever? This can't be undone.")) return;
+    toolRun("admin_delete", { p_id: t.id }, "Deleted " + t.name + "'s account.", true);
+  });
+
   function fetchAnnouncement() {
     if (!sb) return;
     rpc("get_announcement").then(function (t) {
@@ -1096,7 +1237,7 @@
       span.textContent = "Playing as ";
       var b = document.createElement("span");
       b.className = "name";
-      b.textContent = profile.username + (isAdmin() ? " (admin)" : (profile.is_test ? " (test)" : ""));
+      b.textContent = profile.username + (isAdmin() ? " (admin)" : (isNebName(profile.username) ? " (hidden)" : (profile.is_test ? " (test)" : "")));
       var out = document.createElement("button");
       out.className = "linkbtn"; out.textContent = "Log out";
       out.onclick = H(logout);
@@ -1131,12 +1272,20 @@
 
   var mode = "login";
   function isTestName(name) { return /^TESTACCOUNT\d{1,10}$/i.test(name); }
+  function isNebName(name) { return /^nebinator$/i.test(name); }
+  function isGuestName(name) { return isTestName(name); }
+  var TEST_HINT = $("testHint").textContent;
+  var NEB_HINT = "!! NEBINATOR NEEDS NO PASSWORD. YOU CAN PLAY EVERY GAME, BUT YOU NEVER SHOW UP ON THE LEADERBOARD. LOGGING OUT DOESN'T DELETE ANYTHING !!";
+  var NEB_PASSWORD = "nebinator-9fK3xQ7vLm2Zr8Tw";
+  var NEB_CLAIMED = "Nebinator is already taken by a login that doesn't match. In Supabase, go to Authentication > Users, delete the nebinator user, then try again.";
   function emailFor(name) { return name.toLowerCase() + "@" + EMAIL_DOMAIN; }
 
   function refreshAuthUI() {
-    var test = isTestName($("user").value.trim());
+    var uname = $("user").value.trim();
+    var test = isTestName(uname) || isNebName(uname);
     $("passWrap").hidden = test;
     $("confirmWrap").hidden = test || mode !== "signup";
+    $("testHint").textContent = isNebName(uname) ? NEB_HINT : TEST_HINT;
     $("testHint").hidden = !test;
   }
   function setMode(m) {
@@ -1163,7 +1312,23 @@
     err("");
     var job;
 
-    if (isTestName(name)) {
+    if (isNebName(name)) {
+      setBusy(true);
+      var nebMail = emailFor("nebinator");
+      job = guarded(sb.auth.signInWithPassword({ email: nebMail, password: NEB_PASSWORD })).then(function (r) {
+        if (!r.error) return rpc("refresh_me");
+        if (!/invalid login/i.test(r.error.message || "")) throw r.error;
+        return guarded(sb.auth.signUp({ email: nebMail, password: NEB_PASSWORD })).then(function (r2) {
+          if (r2.error) throw r2.error;
+          if (!r2.data || !r2.data.session) {
+            throw new Error("Turn off \"Confirm email\" in Supabase (Authentication > Sign In / Providers > Email) so new accounts can log in right away.");
+          }
+          return rpc("refresh_me");
+        });
+      }).then(function (p) {
+        return (p && p.id) ? p : rpc("create_profile", { p_username: "Nebinator", p_test: false });
+      });
+    } else if (isGuestName(name)) {
       setBusy(true);
       job = guarded(sb.auth.signInAnonymously()).then(function (r) {
         if (r.error) throw r.error;
@@ -1195,7 +1360,7 @@
     }
 
     job.then(afterLogin).catch(function (e) {
-      err(friendly(e));
+      err(isNebName(name) && /already|taken/i.test((e && e.message) || "") ? NEB_CLAIMED : friendly(e));
     }).then(function () { setBusy(false); });
   }
   on($("authGo"), "click", submitAuth);
@@ -1220,6 +1385,10 @@
     shownChips = null;
     rSpinning = false;
     rShownChips = null;
+    pState = null;
+    pBusy = false;
+    pLoaded = false;
+    pNote = "";
     stopTimer();
     closeStats();
     renderWho();
@@ -1260,17 +1429,20 @@
       if (left <= 0) {
         $("timer").textContent = "00:00:00";
         $("rTimer").textContent = "00:00:00";
+        $("pTimer").textContent = "00:00:00";
         if (Date.now() - lastRefillTry > 3000) {
           lastRefillTry = Date.now();
           syncMe().then(function () {
             if (!profile) return;
             if (viewNow === "viewSlots") renderSlots();
             else if (viewNow === "viewRoulette") renderRoulette();
+            else if (viewNow === "viewPoker") renderPoker();
           });
         }
       } else {
         $("timer").textContent = formatTime(left);
         $("rTimer").textContent = formatTime(left);
+        $("pTimer").textContent = formatTime(left);
       }
     }
   }
@@ -1579,6 +1751,222 @@
     });
   }
   on($("rSpinBtn"), "click", rSpin);
+
+  var P_ANTES = [5, 10, 25, 50, 100, 250];
+  var P_SUITS = ["♠", "♥", "♦", "♣"];
+  var P_RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+  var P_STAGES = ["Before the flop", "The flop", "The turn", "The river"];
+  var pAnte = 10;
+  var pState = null;
+  var pBusy = false;
+  var pLoaded = false;
+  var pNote = "";
+
+  function pCard(id) {
+    var el = document.createElement("div");
+    if (id === null || id === undefined) { el.className = "pcard back"; return el; }
+    var suit = Math.floor(id / 13);
+    el.className = "pcard" + (suit === 1 || suit === 2 ? " red" : "");
+    el.textContent = P_RANKS[id % 13] + P_SUITS[suit];
+    return el;
+  }
+  function pEmptyCard() {
+    var el = document.createElement("div");
+    el.className = "pcard empty";
+    return el;
+  }
+  function pFill(box, seat, idx, st) {
+    box.textContent = "";
+    var out = !!seat.folded;
+    var won = st && st.over && st.winners && st.winners.indexOf(idx) >= 0;
+    var cls = "pseat" + (out ? " out" : "") + (won ? " win" : "");
+    if (idx === 0) cls += " pyou";
+    box.className = cls;
+    var nm = document.createElement("div");
+    nm.className = "pname"; nm.textContent = seat.name;
+    var info = document.createElement("div");
+    info.className = "pinfo";
+    var bits = [];
+    if (out) bits.push("Folded");
+    else if (seat.hand) bits.push(seat.hand);
+    bits.push("In: " + Number(seat.contrib).toLocaleString());
+    info.textContent = bits.join(" · ");
+    var cards = document.createElement("div");
+    cards.className = "pcards";
+    if (seat.cards) { cards.appendChild(pCard(seat.cards[0])); cards.appendChild(pCard(seat.cards[1])); }
+    else if (!out) { cards.appendChild(pCard(null)); cards.appendChild(pCard(null)); }
+    box.appendChild(nm); box.appendChild(info); box.appendChild(cards);
+  }
+  function pMsg(kind, text) {
+    $("pMsg").className = "message" + (kind ? " " + kind : "");
+    $("pMsg").textContent = text;
+  }
+  function pResult(st) {
+    var me = st.seats[0];
+    var mine = Number(me.contrib), pay = Number(st.payout), net = pay - mine;
+    if (me.folded) return ["lose", "You folded and lost " + mine.toLocaleString() + " chips."];
+    if (!st.showdown) return ["win", "Everybody else folded. You win " + net.toLocaleString() + " chips!"];
+    var names = st.winners.map(function (w) { return st.seats[w].name; }).join(" & ");
+    var hand = st.seats[st.winners[0]].hand || "";
+    if (net > 0) return ["win", "You win " + net.toLocaleString() + " chips with " + me.hand + "!"];
+    if (net === 0) return ["", "Split pot with " + names + ". You get your chips back."];
+    return ["lose", "You lose " + (-net).toLocaleString() + " chips. " + names + " won with " + hand + "."];
+  }
+
+  function buildAntes() {
+    var box = $("pAntes");
+    box.textContent = "";
+    var chips = profile ? profile.chips : 0;
+    var best = 0;
+    P_ANTES.forEach(function (a) { if (chips >= a * 19) best = a; });
+    if (best && pAnte > best) pAnte = best;
+    if (!best) pAnte = P_ANTES[0];
+    P_ANTES.forEach(function (a) {
+      var btn = document.createElement("button");
+      btn.textContent = String(a);
+      btn.disabled = pBusy || chips < a * 19;
+      if (a === pAnte) btn.className = "sel";
+      btn.title = "Needs " + (a * 19).toLocaleString() + " chips";
+      btn.onclick = H(function () { pAnte = a; buildAntes(); $("pAnteShown").textContent = pAnte; });
+      box.appendChild(btn);
+    });
+    $("pAnteShown").textContent = pAnte;
+  }
+  function pBtn(label, cls, fn) {
+    var b = document.createElement("button");
+    b.textContent = label;
+    if (cls) b.className = cls;
+    b.onclick = H(fn);
+    return b;
+  }
+  function buildPokerActions() {
+    var box = $("pActs");
+    box.textContent = "";
+    var st = pState, chips = profile.chips;
+    var toCall = Number(st.to_call), size = Number(st.size), cost = toCall + size;
+    var fold = pBtn("Fold", "pfold", function () { pAct("fold"); });
+    fold.disabled = pBusy || toCall <= 0;
+    var call = pBtn(toCall > 0 ? "Call " + toCall.toLocaleString() : "Check", "", function () { pAct("call"); });
+    call.disabled = pBusy || toCall > chips;
+    var rz = pBtn((toCall > 0 ? "Raise" : "Bet") + " (" + cost.toLocaleString() + ")", "", function () { pAct("raise"); });
+    rz.disabled = pBusy || !st.can_raise || cost > chips;
+    box.appendChild(fold); box.appendChild(call); box.appendChild(rz);
+  }
+
+  function renderPoker() {
+    var m = profile;
+    if (!m) return;
+    var st = pState;
+    var inHand = !!(st && !st.over);
+    $("pChips").textContent = m.chips.toLocaleString();
+
+    var seatsBox = $("pSeats");
+    seatsBox.textContent = "";
+    for (var i = 1; i <= 3; i++) {
+      var d = document.createElement("div");
+      pFill(d, st ? st.seats[i] : { name: ["", "Rocky", "Pebbles", "Boulder"][i], folded: false, contrib: 0, cards: null, hand: null }, i, st);
+      if (!st) d.querySelector(".pcards").textContent = "";
+      seatsBox.appendChild(d);
+    }
+    var board = $("pBoard");
+    board.textContent = "";
+    for (var b = 0; b < 5; b++) {
+      board.appendChild(st && st.board && b < st.board.length ? pCard(st.board[b]) : pEmptyCard());
+    }
+    $("pPot").textContent = st ? Number(st.pot).toLocaleString() : "0";
+    pFill($("pYou"), st ? st.seats[0] : { name: "You", folded: false, contrib: 0, cards: null, hand: null }, 0, st);
+    if (!st) $("pYou").querySelector(".pcards").textContent = "";
+
+    var broke = !inHand && m.chips <= 0;
+    var poor = !inHand && m.chips > 0 && m.chips < P_ANTES[0] * 19;
+    $("pLock").hidden = !broke;
+    $("pActBox").hidden = !inHand;
+    $("pDealBox").hidden = inHand;
+    if (inHand) {
+      buildPokerActions();
+      if (!pBusy) pMsg("", P_STAGES[st.stage] + ". Your move.");
+    } else {
+      buildAntes();
+      $("pDealBtn").disabled = pBusy || broke || poor || m.chips < pAnte * 19;
+      if (st && st.over && !pBusy) { var r = pResult(st); pMsg(r[0], r[1]); }
+      else if (!st && !pBusy) pMsg("", "Pick an ante and deal a hand.");
+      if (poor && !pBusy) pMsg("lose", "You need at least " + (P_ANTES[0] * 19) + " chips to sit at the poker table.");
+    }
+    if (pNote && !pBusy) pMsg("lose", pNote);
+    var log = $("pLog");
+    log.textContent = "";
+    if (st && st.log) {
+      st.log.slice(-8).forEach(function (line) {
+        var li = document.createElement("li");
+        li.textContent = line;
+        log.appendChild(li);
+      });
+    }
+  }
+
+  function pHandle(res) {
+    if (res && res.blocked) {
+      if (res.profile) setProfile(res.profile);
+      pNote = blockedText(res);
+      renderPoker();
+      return;
+    }
+    pNote = "";
+    if (res && res.profile) setProfile(res.profile);
+    pState = res;
+    renderPoker();
+  }
+  function pFail(e) {
+    pBusy = false;
+    var m = (e && e.message) || "";
+    var text;
+    if (/poker_/i.test(m) && /(does not exist|could not find|schema cache)/i.test(m)) text = "Poker isn't set up on the server yet. Run admin_upgrade.sql in Supabase.";
+    else if (/bad_bet/i.test(m)) text = "You need at least 19 times the ante in chips to sit down.";
+    else if (/not_enough_chips/i.test(m)) text = "You can't afford that. Try folding or checking.";
+    else if (/hand_in_progress|no_hand|not_your_turn/i.test(m)) text = "Your hand got out of sync. Reloading it...";
+    else if (/not_signed_in|no_profile/i.test(m)) text = "Your session ended. Please log in again.";
+    else text = "That didn't go through. Try again.";
+    pNote = text;
+    if (profile && viewNow === "viewPoker") renderPoker();
+    pLoadState();
+  }
+  function pLoadState() {
+    if (!profile || !sb) return;
+    rpc("poker_state").then(function (res) {
+      pLoaded = true;
+      if (res) {
+        if (res.profile) setProfile(res.profile);
+        pState = res;
+      }
+      if (profile && viewNow === "viewPoker") renderPoker();
+    }).catch(function () {
+      pLoaded = true;
+    });
+  }
+  function pStart() {
+    if (pBusy || !profile) return;
+    if (profile.chips < pAnte * 19) { renderPoker(); return; }
+    pBusy = true;
+    pNote = "";
+    $("pDealBtn").disabled = true;
+    pMsg("", "Dealing...");
+    rpc("poker_start", { p_ante: pAnte }).then(function (res) {
+      pBusy = false;
+      pHandle(res);
+    }).catch(pFail);
+  }
+  function pAct(action) {
+    if (pBusy || !pState || pState.over) return;
+    pBusy = true;
+    pNote = "";
+    buildPokerActions();
+    rpc("poker_act", { p_action: action }).then(function (res) {
+      pBusy = false;
+      pHandle(res);
+    }).catch(pFail);
+  }
+  on($("pDealBtn"), "click", pStart);
+
 
   var toastHandle = null;
   function toast(t) {
