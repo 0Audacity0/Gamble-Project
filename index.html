@@ -1753,7 +1753,7 @@
   var P_ANTES = [5, 10, 25, 50, 100, 250];
   var P_SUITS = ["♠", "♥", "♦", "♣"];
   var P_RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-  var P_STAGES = ["Before the flop", "The flop", "The turn", "The river"];
+  var P_STAGES = ["Before the 'flop'", "The flop", "The turn", "The river"];
   var pAnte = 10;
   var pState = null;
   var pBusy = false;
@@ -1862,7 +1862,7 @@
     seatsBox.textContent = "";
     for (var i = 1; i <= 3; i++) {
       var d = document.createElement("div");
-      pFill(d, st ? st.seats[i] : { name: ["", "Bot 1", "Bot 2", "Bot 3"][i], folded: false, contrib: 0, cards: null, hand: null }, i, st);
+      pFill(d, st ? st.seats[i] : { name: ["", "Rocky", "Pebbles", "Boulder"][i], folded: false, contrib: 0, cards: null, hand: null }, i, st);
       if (!st) d.querySelector(".pcards").textContent = "";
       seatsBox.appendChild(d);
     }
