@@ -483,7 +483,7 @@
     <div class="gamegrid">
       <button class="gamecard" id="gameFruit">
         <span class="gameicon">🍓</span>
-        <span class="gamename">Fruit Match</span>
+        <span class="gamename">Basically Just Candy Crush</span>
         <span class="gamedesc">Match 3 or more fruits to earn 50 chips every time. You can earn up to 1,000 chips total from this.</span>
       </button>
     </div>
@@ -2382,7 +2382,7 @@
       renderFruit();
       return;
     }
-    rpc("earn_claim_test", { p_matches: matches }).then(function (res) {
+    rpc("earn_claim", { p_matches: matches }).then(function (res) {
       fBusy = false;
       if (res && res.profile) setProfile(res.profile);
       if (res && res.blocked) {
