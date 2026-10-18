@@ -393,7 +393,7 @@
   </nav>
   <div class="hright">
     <div class="who" id="who"></div>
-    <div class="version">v1.8.6</div>
+    <div class="version">v1.8.7</div>
   </div>
 </header>
 
@@ -571,8 +571,8 @@
     </div>
 
     <div class="paytable">
-      Lining up 3 or more of the same fruit in a row or column is considered a match.<br>
-      <b>50 chips</b> per match, and the most you can ever earn from this game is <b>1,000 chips</b>.
+      Lining up 3 or more of the same fruit in a row or column is a match, and new fruit falls in after it, which can start more matches.<br>
+      <b>50 chips</b> per match, and the most you can ever earn from this game is <b>1,000 chips</b>. After that you can still play for fun.
     </div>
   </section>
 
@@ -2378,7 +2378,7 @@
     if (!fHasMove(fBoard)) fBoard = fNewBoard();
     if (num(profile.earned_total) >= F_CAP) {
       fBusy = false;
-      fSay("", "That's " + plural + ", but you've already earned the 1,000.");
+      fSay("", "That's " + plural + ", but you've already earned the 1,000 chip maximum. Keep playing for fun!");
       renderFruit();
       return;
     }
@@ -2386,13 +2386,13 @@
       fBusy = false;
       if (res && res.profile) setProfile(res.profile);
       if (res && res.blocked) {
-        fSay("lose", res.blocked === "suspended" ? blockedText(res) : "Slow down a little");
+        fSay("lose", res.blocked === "suspended" ? blockedText(res) : "Slow down a little!");
       } else {
         var got = num(res && res.awarded);
         if (got > 0) {
-          fSay("win", "+" + got.toLocaleString() + " chips for " + plural + "!" + (num(res.earned) >= F_CAP ? " That's the '1,000 chip maximum'. : ""));
+          fSay("win", "+" + got.toLocaleString() + " chips for " + plural + "!" + (num(res.earned) >= F_CAP ? " That's the 1,000 chip maximum." : ""));
         } else {
-          fSay("", "No chips this time, you've hit the maximum chips earned.");
+          fSay("", "No chips this time, you've hit the 1,000 chip maximum.");
         }
       }
       if (viewNow === "viewFruit") renderFruit();
