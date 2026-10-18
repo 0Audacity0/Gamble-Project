@@ -320,6 +320,23 @@
   .luckform button.alt { background: var(--felt-deep); color: var(--ivory); }
   .toolrow button.dangerbtn { border-color: #b3262e; color: #ffb4ae; }
   .toolrow button.dangerbtn:hover { background: #7a1c24; color: var(--ivory); }
+  .earnhead { font-family: Rockwell, "Roboto Slab", Georgia, serif; color: var(--brass); margin: 30px 0 12px; }
+  .fearn { text-align: center; font-weight: 700; margin-bottom: 10px; }
+  .fgrid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; max-width: 360px; margin: 0 auto 14px; }
+  .fcell {
+    aspect-ratio: 1; font-size: clamp(1.2rem, 6vw, 1.8rem); line-height: 1; padding: 0;
+    border-radius: 8px; border: 2px solid transparent; background: rgba(0,0,0,.3);
+  }
+  .fcell.sel { border-color: var(--brass); background: rgba(216,169,75,.3); }
+  .fcell.pop { animation: fpop .3s forwards; }
+  .fcell:disabled { opacity: 1; cursor: default; }
+  @keyframes fpop { to { transform: scale(0); opacity: 0; } }
+  .ipnote { display: block; font-size: .75rem; color: var(--muted); font-weight: 400; }
+  .infogrid { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: .9rem; margin: 10px 0 0; }
+  .infogrid dt { color: var(--muted); }
+  .infogrid dd { margin: 0; overflow-wrap: anywhere; }
+  .admincell button.signin { border-color: #8fb4ff; color: #b9d0ff; }
+  .admincell button.signin:hover { background: #2a4a8a; color: var(--ivory); }
   .susptag { color: #f3d9a4; font-weight: 800; margin-left: 6px; }
   .lucktag { color: #f3d27a; font-weight: 800; margin-left: 6px; }
   .lucktag.neg { color: #b9d0ff; }
@@ -376,12 +393,13 @@
   </nav>
   <div class="hright">
     <div class="who" id="who"></div>
-    <div class="version">v1.8.1</div>
+    <div class="version">v1.8.5</div>
   </div>
 </header>
 
 <main>
   <div class="announce" id="announce" role="status" hidden></div>
+  <div class="announce" id="impBanner" role="status" hidden><span id="impText"></span> <button class="linkbtn" id="impBack">Back to admin</button></div>
 
   <section id="viewAuth" hidden>
     <h1>STRAIGHT Gambling (with no consequences!!!!!!)</h1>
@@ -460,6 +478,15 @@
         <span class="gamedesc">Basically just poker.</span>
       </button>
     </div>
+
+    <h2 class="earnhead">Earn Chip's</h2>
+    <div class="gamegrid">
+      <button class="gamecard" id="gameFruit">
+        <span class="gameicon">🍓</span>
+        <span class="gamename">Fruit Match</span>
+        <span class="gamedesc">Match 3 or more fruits to earn 50 chips every time. You can earn up to 1,000 chips total from this.</span>
+      </button>
+    </div>
   </section>
 
   <section id="viewRoulette" hidden>
@@ -528,6 +555,24 @@
 
     <div class="paytable">
      Yes I decided to give the bots the most dumbest names ever<br>
+    </div>
+  </section>
+
+  <section id="viewFruit" hidden>
+    <h1>Fruit Match</h1>
+    <p class="sub">(Swap two fruits that are next to each other to line up 3 or more. Every match is worth 50 chips.)</p>
+
+    <div class="chipbar"><div class="chipcount"><span class="disc"></span><span id="fChips">0</span></div></div>
+
+    <div class="machine">
+      <div class="fearn">Earned from this game: <b id="fEarned">0</b> / 1,000</div>
+      <div class="fgrid" id="fGrid"></div>
+      <div class="message" id="fMsg">Tap a fruit, then tap one right next to it to swap them.</div>
+    </div>
+
+    <div class="paytable">
+      Lining up 3 or more of the same fruit in a row or column is a match, and new fruit falls in after it, which can start more matches.<br>
+      <b>50 chips</b> per match, and the most you can ever earn from this game is <b>1,000 chips</b>. After that you can still play for fun.
     </div>
   </section>
 
@@ -617,6 +662,11 @@
       <div class="luckform">
         <select id="toolPlayer" aria-label="Player"></select>
       </div>
+      <div class="toolrow">
+        <button id="toolInfoBtn">Look at account</button>
+        <button id="toolSignIn">Sign in as them</button>
+      </div>
+      <dl class="infogrid" id="toolInfo"></dl>
       <div class="luckform" style="margin-top:8px">
         <input id="toolChips" type="number" min="1" step="1" value="1000" aria-label="Chips">
         <button id="toolGive">Give chips</button>
@@ -703,6 +753,7 @@
   var tampering = false;
   var locked = false;      // lockdown switch, kept in Supabase
   var lockKick = false;
+  var impersonating = false;
   var LOCK_MSG = "Under Maintenance";
 
   var isAdmin = function () { return !!(profile && profile.is_admin); };
@@ -769,7 +820,7 @@
   function setProfile(p) { profile = p; saveSnap(); }
 
   function caught(kind) {
-    if (tampering || !profile || isAdmin()) return;
+    if (tampering || !profile || isAdmin() || impersonating) return;
     tampering = true;
     if (guardObs) guardObs.disconnect();
     stopTimer();
@@ -784,7 +835,7 @@
   }
 
   function integrityTick() {
-    if (tampering || !profile || isAdmin()) return;
+    if (tampering || !profile || isAdmin() || impersonating) return;
     var s = load(SNAP_KEY, null);
     if (!s) { forceLogout(""); return; }
     if (!snapOk(s)) caught("storage");
@@ -813,7 +864,7 @@
       });
       if (outside) caught("page");
     });
-    ["who", "viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewPoker", "viewBoard", "viewCredits", "viewPanel", "statsModal"].forEach(function (id) {
+    ["who", "viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewPoker", "viewFruit", "viewBoard", "viewCredits", "viewPanel", "statsModal"].forEach(function (id) {
       guardObs.observe($(id), { childList: true, subtree: true, attributes: true, characterData: true });
     });
     guardObs.observe(document.querySelector("header"), { childList: true, subtree: true, attributes: true, characterData: true });
@@ -861,9 +912,9 @@
 
   function show(view) {
     if (view === "viewPanel" && !isAdmin()) view = profile ? "viewSlots" : "viewAuth";
-    if ((view === "viewGames" || view === "viewRoulette" || view === "viewPoker") && !profile) view = "viewAuth";
+    if ((view === "viewGames" || view === "viewRoulette" || view === "viewPoker" || view === "viewFruit") && !profile) view = "viewAuth";
     viewNow = view;
-    ["viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewPoker", "viewBoard", "viewCredits", "viewPanel"].forEach(function (v) { $(v).hidden = (v !== view); });
+    ["viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewPoker", "viewFruit", "viewBoard", "viewCredits", "viewPanel"].forEach(function (v) { $(v).hidden = (v !== view); });
     $("navBoard").classList.toggle("active", view === "viewBoard");
     $("navCredits").classList.toggle("active", view === "viewCredits");
     $("navPanel").classList.toggle("active", view === "viewPanel");
@@ -881,6 +932,7 @@
     if (view === "viewSlots") renderSlots();
     if (view === "viewRoulette") renderRoulette();
     if (view === "viewPoker") { renderPoker(); if (!pLoaded) pLoadState(); }
+    if (view === "viewFruit") renderFruit();
     if (view === "viewBoard") {
       renderBoard();
 
@@ -897,6 +949,7 @@
   on($("gameSlots"), "click", function () { show("viewSlots"); });
   on($("gameRoulette"), "click", function () { show("viewRoulette"); });
   on($("gamePoker"), "click", function () { show("viewPoker"); });
+  on($("gameFruit"), "click", function () { show("viewFruit"); });
   on($("creditsVideo"), "error", function () { $("videoErr").hidden = false; });
 
   var PANEL_SEEN_KEY = "luckyslots_panelseen_v1";
@@ -1055,9 +1108,7 @@
       var left = document.createElement("div");
       var name = document.createElement("span");
       name.className = "feedname"; name.textContent = r.username;
-      var pill = document.createElement("span");
-      pill.className = "pill warn"; pill.textContent = "TAKE A LOOK";
-      left.appendChild(name); left.appendChild(pill);
+      left.appendChild(name);
       var why = document.createElement("div");
       why.className = "feedwhy"; why.textContent = r.reason || "";
       left.appendChild(why);
@@ -1068,6 +1119,139 @@
       li.appendChild(left); li.appendChild(right);
       feed.appendChild(li);
     });
+  }
+
+  function fmtDate(v) { return v ? new Date(v).toLocaleString() : ""; }
+  function showPlayerInfo(info) {
+    var box = $("toolInfo");
+    box.textContent = "";
+    if (!info) { ptoast("Couldn't find that account."); return; }
+    var same = info.same_ip || [];
+    var rows = [
+      ["Username", info.username],
+      ["Chips", num(info.chips).toLocaleString()],
+      ["Best chips", num(info.peak).toLocaleString()],
+      ["Slots spins", (num(info.pairs) + num(info.jackpots) + num(info.losses)).toLocaleString()],
+      ["Pairs / jackpots / losses", num(info.pairs) + " / " + num(info.jackpots) + " / " + num(info.losses)],
+      ["Chips spent", num(info.spent).toLocaleString()],
+      ["Earned from Fruit Match", num(info.earned).toLocaleString() + " / 1,000"],
+      ["Times caught cheating", String(num(info.cheats))],
+      ["Cheater title until", info.cheater_until ? fmtDate(info.cheater_until) : "none"],
+      ["Suspended until", info.suspended_until ? fmtDate(info.suspended_until) : "no"],
+      ["Luck modifier", num(info.luck_level) !== 0 ? luckStr(num(info.luck_level)) + ", " + fmtLeft(info.luck_until) : "none"],
+      ["Joined", fmtDate(info.created_at)],
+      ["Last seen", info.last_seen ? fmtDate(info.last_seen) : "not recorded yet"],
+      ["Last IP", info.last_ip || "not recorded yet"],
+      ["First IP", info.first_ip || "not recorded yet"],
+      ["Other accounts on that IP", same.length ? same.join(", ") : "none"],
+      ["Can be signed into", info.can_sign_in ? "yes" : "no (test and admin accounts have no password)"]
+    ];
+    rows.forEach(function (row) {
+      var dt = document.createElement("dt"); dt.textContent = row[0];
+      var dd = document.createElement("dd"); dd.textContent = row[1];
+      box.appendChild(dt); box.appendChild(dd);
+    });
+  }
+  on($("toolPlayer"), "change", function () { $("toolInfo").textContent = ""; });
+  on($("toolInfoBtn"), "click", function () {
+    if (!isAdmin()) return;
+    var t = toolTarget(); if (!t) return;
+    rpc("admin_player_info", { p_id: t.id }).then(showPlayerInfo).catch(function (e) {
+      ptoast(/does not exist|could not find|schema cache/i.test((e && e.message) || "") ? "Run admin_extras.sql in Supabase first." : "That didn't go through.");
+    });
+  });
+  on($("toolSignIn"), "click", function () {
+    if (!isAdmin()) return;
+    var t = toolTarget(); if (!t) return;
+    startImpersonate(t.id, t.name, ptoast);
+  });
+
+  var IMP_KEY = "luckyslots_admin_stash";
+  function stashRead() { try { var v = sessionStorage.getItem(IMP_KEY); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function stashWrite(o) { try { sessionStorage.setItem(IMP_KEY, JSON.stringify(o)); } catch (e) {} }
+  function stashClear() { try { sessionStorage.removeItem(IMP_KEY); } catch (e) {} }
+  function updateImpBanner() {
+    var on_ = !!(impersonating && profile);
+    $("impBanner").hidden = !on_;
+    if (on_) $("impText").textContent = "Signed in as " + profile.username + " (admin view). Whatever you do here happens on their account.";
+  }
+  function resetGameState() {
+    spinning = false; shownChips = null;
+    rSpinning = false; rShownChips = null;
+    pState = null; pBusy = false; pLoaded = false; pNote = "";
+    fBoard = null; fSel = -1; fBusy = false; fPop = [];
+    stopTimer();
+    closeStats();
+    $("msg").textContent = "Pick a bet and pull the lever.";
+    $("msg").className = "message";
+    $("rMsg").textContent = "Pick what to bet on, then press \"spin\".";
+    $("rMsg").className = "message";
+  }
+  function switchedAccount(p) {
+    setProfile(p);
+    resetGameState();
+    renderWho();
+    updateImpBanner();
+    fetchAnnouncement();
+    show("viewSlots");
+  }
+  function gameBusy() { return !!(spinning || rSpinning || pBusy || fBusy); }
+  function startImpersonate(id, name, say) {
+    if (!isAdmin() || impersonating) return;
+    if (gameBusy()) { say("Wait for your game to finish first."); return; }
+    if (!window.confirm("Sign in as " + name + "? You'll see and play as them until you press \"Back to admin\".")) return;
+    var stash = null, signedIn = false;
+    guarded(sb.auth.getSession()).then(function (r) {
+      var sess = r && r.data && r.data.session;
+      if (!sess) throw new Error("no_session");
+      stash = { access_token: sess.access_token, refresh_token: sess.refresh_token };
+      return rpc("admin_impersonate_begin", { p_id: id });
+    }).then(function (info) {
+      return guarded(sb.auth.signInWithPassword({ email: info.email, password: info.password }));
+    }).then(function (r) {
+      if (r.error) throw r.error;
+      signedIn = true;
+      stashWrite(stash);
+      impersonating = true;
+      return rpc("impersonation_restore");
+    }).then(function () {
+      return rpc("refresh_me");
+    }).then(function (p) {
+      if (!p || !p.id) throw new Error("no_profile");
+      switchedAccount(p);
+    }).catch(function (e) {
+      var m = (e && e.message) || "";
+      if (signedIn) { backToAdmin(); return; }
+      say(/cannot_sign_in/.test(m) ? "You can't sign in as that account (test and admin accounts have no password)."
+        : /not_admin/.test(m) ? "Only the admin can do that."
+        : /does not exist|could not find|schema cache/i.test(m) ? "Run admin_extras.sql in Supabase first."
+        : "Couldn't sign in as them.");
+    });
+  }
+  function backToAdmin() {
+    var stash = stashRead();
+    if (!stash) { impersonating = false; forceLogout("Please log in again."); return; }
+    if (gameBusy()) return;
+    guarded(sb.auth.setSession({ access_token: stash.access_token, refresh_token: stash.refresh_token })).then(function (r) {
+      if (r.error) throw r.error;
+      stashClear();
+      impersonating = false;
+      return rpc("refresh_me");
+    }).then(function (p) {
+      if (!p || !p.id) throw new Error("no_profile");
+      switchedAccount(p);
+      show("viewPanel");
+    }).catch(function () {
+      stashClear();
+      impersonating = false;
+      forceLogout("Couldn't switch back to the admin account. Please log in again.");
+    });
+  }
+  on($("impBack"), "click", backToAdmin);
+
+  function touchMe() {
+    if (!sb || !profile || impersonating) return;
+    rpc("touch_me").catch(function () {});
   }
 
   function fmtLeft(untilStr) {
@@ -1222,7 +1406,7 @@
     btn.textContent = locked ? "Unlock: let people log in and sign up again" : "Log everybody out and lock the game";
     btn.classList.toggle("dangerbtn", !locked);
     $("navPanel").textContent = locked ? "Panel \uD83D\uDD12" : "Panel";
-    if (locked && profile && !isAdmin()) lockOut();
+    if (locked && profile && !isAdmin() && !impersonating) lockOut();
   }
   // Logs the current player out because of the lockdown (test accounts are deleted, like a normal log out).
   function lockOut() {
@@ -1444,13 +1628,14 @@
 
   function afterLogin(p) {
     setProfile(p);
-    if (locked && !p.is_admin) { lockOut(); return; }
+    if (locked && !p.is_admin && !impersonating) { lockOut(); return; }
     if (!p.is_test && !p.is_admin) setCookie("luckyslots_last_user", p.username, 365);
     $("pass").value = ""; $("pass2").value = "";
     $("authNotice").hidden = true;
     err("");
     renderWho();
     fetchAnnouncement();
+    touchMe();
     show("viewSlots");
   }
 
@@ -1464,6 +1649,10 @@
     pBusy = false;
     pLoaded = false;
     pNote = "";
+    fBoard = null; fSel = -1; fBusy = false; fPop = [];
+    impersonating = false;
+    stashClear();
+    updateImpBanner();
     stopTimer();
     closeStats();
     renderWho();
@@ -2042,6 +2231,182 @@
   }
   on($("pDealBtn"), "click", pStart);
 
+  var F_FRUITS = ["🍎", "🍊", "🍋", "🍇", "🍓", "🍉"];
+  var F_N = 8;
+  var F_CAP = 1000;
+  var fBoard = null;
+  var fSel = -1;
+  var fBusy = false;
+  var fPop = [];
+  var fCount = 0;
+
+  function fRand() { return Math.floor(Math.random() * F_FRUITS.length); }
+  function fRuns(b) {
+    var runs = [], r, c, k, x, run, v;
+    for (r = 0; r < F_N; r++) {
+      c = 0;
+      while (c < F_N) {
+        v = b[r * F_N + c];
+        k = c + 1;
+        while (v >= 0 && k < F_N && b[r * F_N + k] === v) k++;
+        if (v >= 0 && k - c >= 3) {
+          run = [];
+          for (x = c; x < k; x++) run.push(r * F_N + x);
+          runs.push(run);
+        }
+        c = k;
+      }
+    }
+    for (c = 0; c < F_N; c++) {
+      r = 0;
+      while (r < F_N) {
+        v = b[r * F_N + c];
+        k = r + 1;
+        while (v >= 0 && k < F_N && b[k * F_N + c] === v) k++;
+        if (v >= 0 && k - r >= 3) {
+          run = [];
+          for (x = r; x < k; x++) run.push(x * F_N + c);
+          runs.push(run);
+        }
+        r = k;
+      }
+    }
+    return runs;
+  }
+  function fCollapse(b, cells) {
+    var out = b.slice(), c, r, col, i;
+    cells.forEach(function (idx) { out[idx] = -1; });
+    for (c = 0; c < F_N; c++) {
+      col = [];
+      for (r = F_N - 1; r >= 0; r--) if (out[r * F_N + c] >= 0) col.push(out[r * F_N + c]);
+      while (col.length < F_N) col.push(fRand());
+      for (r = F_N - 1, i = 0; r >= 0; r--, i++) out[r * F_N + c] = col[i];
+    }
+    return out;
+  }
+  function fSwap(b, x, y) { var t = b[x]; b[x] = b[y]; b[y] = t; }
+  function fAdjacent(x, y) {
+    var d = Math.abs(x - y);
+    return d === F_N || (d === 1 && Math.floor(x / F_N) === Math.floor(y / F_N));
+  }
+  function fHasMove(b) {
+    var i, ok;
+    for (i = 0; i < F_N * F_N; i++) {
+      if (i % F_N < F_N - 1) { fSwap(b, i, i + 1); ok = fRuns(b).length > 0; fSwap(b, i, i + 1); if (ok) return true; }
+      if (i + F_N < F_N * F_N) { fSwap(b, i, i + F_N); ok = fRuns(b).length > 0; fSwap(b, i, i + F_N); if (ok) return true; }
+    }
+    return false;
+  }
+  function fNewBoard() {
+    var b, i, v, bad;
+    do {
+      b = [];
+      for (i = 0; i < F_N * F_N; i++) {
+        do {
+          v = fRand();
+          bad = (i % F_N >= 2 && b[i - 1] === v && b[i - 2] === v) || (i >= 2 * F_N && b[i - F_N] === v && b[i - 2 * F_N] === v);
+        } while (bad);
+        b.push(v);
+      }
+    } while (!fHasMove(b));
+    return b;
+  }
+
+  function fSay(kind, text) {
+    $("fMsg").className = "message" + (kind ? " " + kind : "");
+    $("fMsg").textContent = text;
+  }
+  function renderFruit() {
+    var m = profile;
+    if (!m) return;
+    if (!fBoard) fBoard = fNewBoard();
+    $("fChips").textContent = m.chips.toLocaleString();
+    $("fEarned").textContent = Math.min(num(m.earned_total), F_CAP).toLocaleString();
+    var grid = $("fGrid");
+    grid.textContent = "";
+    fBoard.forEach(function (v, i) {
+      var b = document.createElement("button");
+      b.className = "fcell" + (i === fSel ? " sel" : "") + (fPop.indexOf(i) >= 0 ? " pop" : "");
+      b.textContent = F_FRUITS[v];
+      b.disabled = fBusy;
+      b.onclick = H(function () { fClick(i); });
+      grid.appendChild(b);
+    });
+  }
+  function fClick(i) {
+    if (fBusy || !profile) return;
+    if (fSel < 0 || fSel === i || !fAdjacent(fSel, i)) {
+      fSel = (fSel === i) ? -1 : i;
+      renderFruit();
+      return;
+    }
+    var a = fSel;
+    fSel = -1;
+    fSwap(fBoard, a, i);
+    var runs = fRuns(fBoard);
+    if (!runs.length) {
+      fSwap(fBoard, a, i);
+      fSay("", "No match there. Try a different swap.");
+      renderFruit();
+      return;
+    }
+    fBusy = true;
+    fCount = 0;
+    fSay("", "Nice!");
+    fStep(runs);
+  }
+  function fStep(runs) {
+    fCount += runs.length;
+    var seen = {}, cells = [];
+    runs.forEach(function (run) {
+      run.forEach(function (idx) { if (!seen[idx]) { seen[idx] = 1; cells.push(idx); } });
+    });
+    fPop = cells;
+    renderFruit();
+    later(function () {
+      fBoard = fCollapse(fBoard, cells);
+      fPop = [];
+      var next = fRuns(fBoard);
+      renderFruit();
+      if (next.length) later(function () { fStep(next); }, 250);
+      else fFinish();
+    }, 300);
+  }
+  function fFinish() {
+    var matches = fCount;
+    var plural = matches + " match" + (matches === 1 ? "" : "es");
+    if (!fHasMove(fBoard)) fBoard = fNewBoard();
+    if (num(profile.earned_total) >= F_CAP) {
+      fBusy = false;
+      fSay("", "That's " + plural + ", but you've already earned the 1,000 chip maximum. Keep playing for fun!");
+      renderFruit();
+      return;
+    }
+    rpc("earn_claim", { p_matches: matches }).then(function (res) {
+      fBusy = false;
+      if (res && res.profile) setProfile(res.profile);
+      if (res && res.blocked) {
+        fSay("lose", res.blocked === "suspended" ? blockedText(res) : "Slow down a little!");
+      } else {
+        var got = num(res && res.awarded);
+        if (got > 0) {
+          fSay("win", "+" + got.toLocaleString() + " chips for " + plural + "!" + (num(res.earned) >= F_CAP ? " That's the 1,000 chip maximum." : ""));
+        } else {
+          fSay("", "No chips this time, you've hit the 1,000 chip maximum.");
+        }
+      }
+      if (viewNow === "viewFruit") renderFruit();
+    }).catch(function (e) {
+      fBusy = false;
+      var m = (e && e.message) || "";
+      fSay("lose", /earn_claim/i.test(m) && /(does not exist|could not find|schema cache)/i.test(m)
+        ? "Earn Chip's isn't set up on the server yet. Run admin_extras.sql in Supabase."
+        : (/game_locked/i.test(m) ? LOCK_MSG : "That didn't go through. Try again."));
+      if (viewNow === "viewFruit") renderFruit();
+    });
+  }
+
+
 
   var toastHandle = null;
   function toast(t) {
@@ -2091,7 +2456,19 @@
 
     rpc("get_leaderboard").then(function (rows) {
       if (viewNow !== "viewBoard") return;
-      draw(rows || [], admin);
+      rows = rows || [];
+      if (!admin) { draw(rows, admin, null); return; }
+      return rpc("admin_player_ips").then(function (ipRows) {
+        var names = {}, ips = { byId: {}, byIp: {} };
+        rows.forEach(function (r) { names[r.id] = r.username; });
+        (ipRows || []).forEach(function (r) {
+          ips.byId[r.id] = r.last_ip;
+          if (names[r.id]) (ips.byIp[r.last_ip] = ips.byIp[r.last_ip] || []).push(names[r.id]);
+        });
+        if (viewNow === "viewBoard") draw(rows, admin, ips);
+      }).catch(function () {
+        if (viewNow === "viewBoard") draw(rows, admin, null);
+      });
     }).catch(function () {
       body.textContent = "";
       var tr = document.createElement("tr"), td = document.createElement("td");
@@ -2101,7 +2478,7 @@
     });
   }
 
-  function draw(rows, admin) {
+  function draw(rows, admin, ips) {
     var body = $("boardBody");
     body.textContent = "";
     if (!rows.length) {
@@ -2137,6 +2514,14 @@
           var stag = document.createElement("span");
           stag.className = "susptag"; stag.textContent = "SUSPENDED";
           td.appendChild(stag);
+        }
+        if (idx === 1 && admin && ips && ips.byId[r.id]) {
+          var ipv = ips.byId[r.id];
+          var same = (ips.byIp[ipv] || []).filter(function (n) { return n !== r.username; });
+          var ipn = document.createElement("span");
+          ipn.className = "ipnote";
+          ipn.textContent = "IP " + ipv + (same.length ? " (same IP as " + same.join(", ") + ")" : "");
+          td.appendChild(ipn);
         }
         tr.appendChild(td);
       });
@@ -2199,6 +2584,11 @@
             adminDo("admin_suspend", { p_id: r.id, p_hours: hrs }, "Suspended " + r.username + " for " + hrs + " hour" + (hrs === 1 ? "" : "s") + ".");
           });
           box.appendChild(sp);
+          var si = document.createElement("button");
+          si.className = "signin"; si.textContent = "Sign in";
+          si.title = "Sign in as this player";
+          si.onclick = H(function () { startImpersonate(r.id, r.username, toast); });
+          box.appendChild(si);
           var del = document.createElement("button");
           del.className = "del"; del.textContent = "Delete";
           del.onclick = H(function () {
@@ -2237,6 +2627,15 @@
       drop(SNAP_KEY);
       return null;
     }).catch(function () { return null; }).then(function () {
+      if (profile && stashRead()) {
+        if (profile.is_admin) stashClear();
+        else impersonating = true;
+      } else if (stashRead()) {
+        stashClear();
+      }
+      updateImpBanner();
+      touchMe();
+      every(touchMe, 300000);
       renderWho();
       goSlots();
       refreshAuthUI();
