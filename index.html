@@ -393,7 +393,7 @@
   </nav>
   <div class="hright">
     <div class="who" id="who"></div>
-    <div class="version">v1.8.7</div>
+    <div class="version">v1.8.8</div>
   </div>
 </header>
 
@@ -483,7 +483,7 @@
     <div class="gamegrid">
       <button class="gamecard" id="gameFruit">
         <span class="gameicon">🍓</span>
-        <span class="gamename">Fruit Match</span>
+        <span class="gamename">I Think This Is Candy Crush</span>
         <span class="gamedesc">Match 3 or more fruits to earn 50 chips every time. You can earn up to 1,000 chips total from this.</span>
       </button>
     </div>
@@ -559,7 +559,7 @@
   </section>
 
   <section id="viewFruit" hidden>
-    <h1>Fruit Match</h1>
+    <h1>I Think This Is Candy Crush</h1>
     <p class="sub">(Swap two fruits that are next to each other to line up 3 or more. Every match is worth 50 chips.)</p>
 
     <div class="chipbar"><div class="chipcount"><span class="disc"></span><span id="fChips">0</span></div></div>
@@ -571,8 +571,8 @@
     </div>
 
     <div class="paytable">
-      Lining up 3 or more of the same fruit in a row or column is a match, and new fruit falls in after it, which can start more matches.<br>
-      <b>50 chips</b> per match, and the most you can ever earn from this game is <b>1,000 chips</b>. After that you can still play for fun.
+      Lining up 3 or more of the same fruit in a row or column is a match.<br>
+      <b>50 chips</b> per match, and the most you can ever earn from this game is <b>1,000 chips</b> until you run out of chips. You can still play for fun, though.
     </div>
   </section>
 
@@ -1134,7 +1134,7 @@
       ["Slots spins", (num(info.pairs) + num(info.jackpots) + num(info.losses)).toLocaleString()],
       ["Pairs / jackpots / losses", num(info.pairs) + " / " + num(info.jackpots) + " / " + num(info.losses)],
       ["Chips spent", num(info.spent).toLocaleString()],
-      ["Earned from Fruit Match", num(info.earned).toLocaleString() + " / 1,000"],
+      ["Earned from Candy Crush", num(info.earned).toLocaleString() + " / 1,000"],
       ["Times caught cheating", String(num(info.cheats))],
       ["Cheater title until", info.cheater_until ? fmtDate(info.cheater_until) : "none"],
       ["Suspended until", info.suspended_until ? fmtDate(info.suspended_until) : "no"],
@@ -1405,7 +1405,7 @@
     var btn = $("lockToggle");
     btn.textContent = locked ? "Unlock: let people log in and sign up again" : "Log everybody out and lock the game";
     btn.classList.toggle("dangerbtn", !locked);
-    $("navPanel").textContent = locked ? "Panel \uD83D\uDD12" : "Panel";
+    $("navPanel").textContent = "Panel";
     if (locked && profile && !isAdmin() && !impersonating) lockOut();
   }
   // Logs the current player out because of the lockdown (test accounts are deleted, like a normal log out).
@@ -2346,13 +2346,13 @@
     var runs = fRuns(fBoard);
     if (!runs.length) {
       fSwap(fBoard, a, i);
-      fSay("", "No match there. Try a different swap.");
+      fSay("", "No match. Try another swap.");
       renderFruit();
       return;
     }
     fBusy = true;
     fCount = 0;
-    fSay("", "Nice!");
+    fSay("", "Noice");
     fStep(runs);
   }
   function fStep(runs) {
@@ -2378,7 +2378,7 @@
     if (!fHasMove(fBoard)) fBoard = fNewBoard();
     if (num(profile.earned_total) >= F_CAP) {
       fBusy = false;
-      fSay("", "That's " + plural + ", but you've already earned the 1,000 chip maximum. Keep playing for fun!");
+      fSay("", "That's " + plural + ", but you've already earned the 1,000 chip maximum.");
       renderFruit();
       return;
     }
@@ -2386,7 +2386,7 @@
       fBusy = false;
       if (res && res.profile) setProfile(res.profile);
       if (res && res.blocked) {
-        fSay("lose", res.blocked === "suspended" ? blockedText(res) : "Slow down a little!");
+        fSay("lose", res.blocked === "suspended" ? blockedText(res) : "Slow down a little dude");
       } else {
         var got = num(res && res.awarded);
         if (got > 0) {
@@ -2422,7 +2422,7 @@
       toast(doneText);
       return refreshMe();
     }).then(function () {
-      if (!profile) { forceLogout("Your account was removed or your session ended."); return; }
+      if (!profile) { forceLogout("Your account was most likely removed or your session ended."); return; }
       renderWho();
       renderBoard();
     }).catch(function (e) {
