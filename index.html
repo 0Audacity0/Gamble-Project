@@ -339,6 +339,8 @@
   .admincell button.approve:hover { background: #1f6b3a; color: var(--ivory); }
   .admincell button.signin { border-color: #8fb4ff; color: #b9d0ff; }
   .admincell button.signin:hover { background: #2a4a8a; color: var(--ivory); }
+  .changelog { max-width: 620px; margin: 0 auto; padding-left: 22px; line-height: 1.6; }
+  .changelog li { margin-bottom: 8px; }
   .susptag { color: #f3d9a4; font-weight: 800; margin-left: 6px; }
   .lucktag { color: #f3d27a; font-weight: 800; margin-left: 6px; }
   .lucktag.neg { color: #b9d0ff; }
@@ -395,7 +397,7 @@
   </nav>
   <div class="hright">
     <div class="who" id="who"></div>
-    <div class="version">v1.8.9</div>
+    <div class="version">v1.9.0</div>
   </div>
 </header>
 
@@ -576,6 +578,23 @@
       Lining up 3 or more of the same fruit in a row or column is a match.<br>
       <b>50 chips</b> per match, and the most you can ever earn from this game is <b>1,000 chips</b> until you run out of chips. You can still play for fun, though.
     </div>
+  </section>
+
+  <section id="viewNew" hidden>
+    <h1>What's new in <span id="newVer">v1.9.0</span></h1>
+    <p class="sub" id="newSub">"The Nothing Update"</p>
+    <ul class="changelog" id="changelog">
+      <li>New(er) authorization: Now requires ADMIN approval to start playing</li>
+      <li></li>
+      <li>New Earn Chip's section: I Think This Is Candy Crush (earn up to 1,000 chips)</li>
+      <li></li>
+      <li>Added this "What's new" tab</li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
   </section>
 
   <section id="viewCredits" hidden>
@@ -887,7 +906,7 @@
       });
       if (outside) caught("page");
     });
-    ["who", "viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewPoker", "viewFruit", "viewBoard", "viewCredits", "viewPanel", "statsModal"].forEach(function (id) {
+    ["who", "viewAuth", "viewSlots", "viewGames", "viewNew", "viewRoulette", "viewPoker", "viewFruit", "viewBoard", "viewCredits", "viewPanel", "statsModal"].forEach(function (id) {
       guardObs.observe($(id), { childList: true, subtree: true, attributes: true, characterData: true });
     });
     guardObs.observe(document.querySelector("header"), { childList: true, subtree: true, attributes: true, characterData: true });
@@ -934,11 +953,23 @@
     });
   }
 
+  function renderNew() {
+    $("newVer").textContent = ((document.querySelector(".version") || {}).textContent || "").trim();
+    var sub = $("newSub");
+    sub.hidden = sub.textContent.trim() === "";
+    var shown = 0;
+    Array.prototype.forEach.call($("changelog").children, function (li) {
+      var has = li.textContent.trim() !== "";
+      var hide = !has || shown >= 10;
+      if (!hide) shown++;
+      li.hidden = hide;
+    });
+  }
   function show(view) {
     if (view === "viewPanel" && !isAdmin()) view = profile ? "viewSlots" : "viewAuth";
     if ((view === "viewGames" || view === "viewRoulette" || view === "viewPoker" || view === "viewFruit") && !profile) view = "viewAuth";
     viewNow = view;
-    ["viewAuth", "viewSlots", "viewGames", "viewRoulette", "viewPoker", "viewFruit", "viewBoard", "viewCredits", "viewPanel"].forEach(function (v) { $(v).hidden = (v !== view); });
+    ["viewAuth", "viewSlots", "viewGames", "viewNew", "viewRoulette", "viewPoker", "viewFruit", "viewBoard", "viewCredits", "viewPanel"].forEach(function (v) { $(v).hidden = (v !== view); });
     $("navBoard").classList.toggle("active", view === "viewBoard");
     $("navCredits").classList.toggle("active", view === "viewCredits");
     $("navPanel").classList.toggle("active", view === "viewPanel");
@@ -957,6 +988,7 @@
     if (view === "viewRoulette") renderRoulette();
     if (view === "viewPoker") { renderPoker(); if (!pLoaded) pLoadState(); }
     if (view === "viewFruit") renderFruit();
+    if (view === "viewNew") renderNew();
     if (view === "viewBoard") {
       renderBoard();
 
@@ -1561,6 +1593,9 @@
     w.textContent = "";
     $("navPanel").hidden = !isAdmin();
     if (profile) {
+      var nw = document.createElement("button");
+      nw.className = "statsbtn"; nw.textContent = "What's new";
+      nw.onclick = H(function () { show("viewNew"); });
       var gm = document.createElement("button");
       gm.className = "statsbtn"; gm.textContent = "Games";
       gm.onclick = H(function () { show("viewGames"); });
@@ -1575,7 +1610,7 @@
       var out = document.createElement("button");
       out.className = "linkbtn"; out.textContent = "Log out";
       out.onclick = H(logout);
-      w.appendChild(gm); w.appendChild(st); w.appendChild(span); w.appendChild(b); w.appendChild(out);
+      w.appendChild(nw); w.appendChild(gm); w.appendChild(st); w.appendChild(span); w.appendChild(b); w.appendChild(out);
     } else {
       var s = document.createElement("span");
       s.textContent = "Not signed in";
