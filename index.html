@@ -335,6 +335,8 @@
   .infogrid { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: .9rem; margin: 10px 0 0; }
   .infogrid dt { color: var(--muted); }
   .infogrid dd { margin: 0; overflow-wrap: anywhere; }
+  .admincell button.approve { border-color: #6fd08c; color: #a6f0bd; }
+  .admincell button.approve:hover { background: #1f6b3a; color: var(--ivory); }
   .admincell button.signin { border-color: #8fb4ff; color: #b9d0ff; }
   .admincell button.signin:hover { background: #2a4a8a; color: var(--ivory); }
   .susptag { color: #f3d9a4; font-weight: 800; margin-left: 6px; }
@@ -393,7 +395,7 @@
   </nav>
   <div class="hright">
     <div class="who" id="who"></div>
-    <div class="version">v1.8.8</div>
+    <div class="version">v1.8.9</div>
   </div>
 </header>
 
@@ -604,6 +606,12 @@
     <h1>Panel</h1>
     <p class="sub">People who are logged into this account SHOULD be the only ones seing this.</p>
     <div class="toast" id="panelToast" role="status"></div>
+
+    <div class="notifier">
+      <div class="notifhead"><h2>Waiting for approval</h2><span class="notifstamp" id="pendCount"></span></div>
+      <div class="note" style="margin:0 0 8px">New accounts can't be used (or logged into) until you approve them. Reject deletes the account.</div>
+      <ul class="feed" id="pendList"></ul>
+    </div>
 
     <div class="notifier">
       <div class="notifhead"><h2>Overview</h2></div>
@@ -817,7 +825,22 @@
     if (!profile) { drop(SNAP_KEY); return; }
     save(SNAP_KEY, { p: profile, sig: snapSig(profile) });
   }
-  function setProfile(p) { profile = p; saveSnap(); }
+  var PENDING_MSG = "Your account is waiting for the admin to approve it. You can't use it until then.";
+  var pendingKick = false;
+  function pendingLogout() {
+    if (pendingKick) return;
+    pendingKick = true;
+    guarded(sb.auth.signOut({ scope: "local" })).catch(function () {}).then(function () {
+      resetToLoggedOut();
+      err(PENDING_MSG);
+      pendingKick = false;
+    });
+  }
+  function setProfile(p) {
+    profile = p;
+    saveSnap();
+    if (p && p.approved === false && !p.is_admin && !impersonating) pendingLogout();
+  }
 
   function caught(kind) {
     if (tampering || !profile || isAdmin() || impersonating) return;
@@ -885,6 +908,7 @@
   function friendly(e) {
     var m = (e && e.message) ? e.message : String(e);
     if (/game_locked/i.test(m)) return LOCK_MSG;
+    if (/banned|not_approved/i.test(m)) return PENDING_MSG;
     if (/username_taken|already registered|already been registered/i.test(m)) return "That username is taken.";
     if (/invalid login/i.test(m)) return "Wrong username or password.";
     if (/anonymous/i.test(m)) return "Test accounts need \"Anonymous sign-ins\" turned on in Supabase (Authentication > Sign In / Providers).";
@@ -1041,6 +1065,7 @@
     var tabNow = panelTab;
     renderOverview();
     renderLuck(false);
+    renderPending();
     var job = (tabNow === "sus")
       ? rpc("admin_suspicious")
       : rpc("admin_get_events", { p_kind: tabNow, p_limit: 100 });
@@ -1121,6 +1146,67 @@
     });
   }
 
+  function getBoardRows() {
+    return rpc("get_board").catch(function (e) {
+      var m = (e && e.message) || "";
+      if (/get_board/i.test(m) && /(could not find|does not exist|schema cache)/i.test(m)) return rpc("get_leaderboard");
+      throw e;
+    });
+  }
+  function renderPending() {
+    rpc("admin_pending").then(function (rows) {
+      if (viewNow !== "viewPanel") return;
+      rows = rows || [];
+      $("pendCount").textContent = rows.length ? rows.length + " waiting" : "";
+      var list = $("pendList");
+      list.textContent = "";
+      if (!rows.length) {
+        var none = document.createElement("li");
+        none.className = "feedempty";
+        none.textContent = "Nobody is waiting for approval.";
+        list.appendChild(none);
+        return;
+      }
+      rows.forEach(function (r) {
+        var li = document.createElement("li");
+        li.className = "feeditem fresh";
+        var left = document.createElement("div");
+        var name = document.createElement("span");
+        name.className = "feedname"; name.textContent = r.username;
+        var why = document.createElement("div");
+        why.className = "feedwhy";
+        why.textContent = "Signed up " + fmtDate(r.created_at) + (r.ip ? " · IP " + r.ip : "");
+        left.appendChild(name); left.appendChild(why);
+        var right = document.createElement("div");
+        right.className = "admincell";
+        var ok = document.createElement("button");
+        ok.className = "approve"; ok.textContent = "Approve";
+        ok.onclick = H(function () {
+          rpc("admin_approve", { p_id: r.id }).then(function () {
+            ptoast(r.username + " is approved. They can log in now.");
+            renderPending();
+            renderLuck(true);
+          }).catch(function () { ptoast("That didn't go through."); });
+        });
+        var no = document.createElement("button");
+        no.className = "del"; no.textContent = "Reject";
+        no.onclick = H(function () {
+          if (!window.confirm("Reject " + r.username + "? This deletes their account.")) return;
+          rpc("admin_delete", { p_id: r.id }).then(function () {
+            ptoast("Rejected and deleted " + r.username + ".");
+            renderPending();
+          }).catch(function () { ptoast("That didn't go through."); });
+        });
+        right.appendChild(ok); right.appendChild(no);
+        li.appendChild(left); li.appendChild(right);
+        list.appendChild(li);
+      });
+    }).catch(function () {
+      if (viewNow !== "viewPanel") return;
+      $("pendCount").textContent = "";
+      $("pendList").textContent = "Couldn't load this. Did you run admin_approval.sql in Supabase?";
+    });
+  }
   function fmtDate(v) { return v ? new Date(v).toLocaleString() : ""; }
   function showPlayerInfo(info) {
     var box = $("toolInfo");
@@ -1265,7 +1351,7 @@
   }
   function luckStr(n) { return "LUCK " + (n > 0 ? "+" : "") + n; }
   function renderLuck(refillSelect) {
-    rpc("get_leaderboard").then(function (rows) {
+    getBoardRows().then(function (rows) {
       if (viewNow !== "viewPanel") return;
       rows = rows || [];
       if (refillSelect) {
@@ -1627,6 +1713,7 @@
   });
 
   function afterLogin(p) {
+    if (p && p.approved === false && !p.is_admin) { pendingLogout(); return; }
     setProfile(p);
     if (locked && !p.is_admin && !impersonating) { lockOut(); return; }
     if (!p.is_test && !p.is_admin) setCookie("luckyslots_last_user", p.username, 365);
@@ -2454,7 +2541,7 @@
       return;
     }
 
-    rpc("get_leaderboard").then(function (rows) {
+    getBoardRows().then(function (rows) {
       if (viewNow !== "viewBoard") return;
       rows = rows || [];
       if (!admin) { draw(rows, admin, null); return; }
