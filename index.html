@@ -53,6 +53,7 @@
     border: 2px solid var(--brass); border-radius: 8px; padding: 5px 12px;
   }
   .statsbtn:hover { background: rgba(216,169,75,.18); }
+  .statsbtn .new-alert { display: inline-flex; align-items: center; justify-content: center; margin-left: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--ruby); color: white; font-size: .8rem; line-height: 1; }
 
   main { max-width: 760px; margin: 0 auto; padding: 24px 16px 60px; }
   h1, h2 { font-family: Rockwell, "Roboto Slab", Georgia, serif; margin: 0 0 6px; letter-spacing: .5px; }
@@ -397,7 +398,7 @@
   </nav>
   <div class="hright">
     <div class="who" id="who"></div>
-    <div class="version">v1.9.0</div>
+    <div class="version">v1.9.1</div>
   </div>
 </header>
 
@@ -581,14 +582,14 @@
   </section>
 
   <section id="viewNew" hidden>
-    <h1>What's new in <span id="newVer">v1.9.0</span></h1>
-    <p class="sub" id="newSub">"The Nothing Update"</p>
+    <h1>What's new in <span id="newVer">v1.9.1</span></h1>
+    <p class="sub" id="newSub">"The Something Update"</p>
     <ul class="changelog" id="changelog">
-      <li>New(er) authorization: Now requires ADMIN approval to start playing</li>
+      <li>Added the exclamation mark near the What's New tab</li>
+      <li>Made the Poker bots less stupid</li>
+      <li>Made Roulette more randomized, so no getting chips as easily</li>
       <li></li>
-      <li>New Earn Chip's section: I Think This Is Candy Crush (earn up to 1,000 chips)</li>
       <li></li>
-      <li>Added this "What's new" tab</li>
       <li></li>
       <li></li>
       <li></li>
@@ -764,6 +765,17 @@
   var SIG_SECRET = "ls-9f3a71c2-b8d4-4e07";
   var SYMBOLS = ["🍒", "🍋", "🍇", "🔔", "⭐", "💎", "7️⃣"];
   var BET_OPTIONS = [5, 10, 25, 50, 100];
+
+  // The What's New indicator is cleared per browser when the tab is opened.
+  var UPDATE_SEEN_KEY = "luckyslots_whats_new_seen_v1";
+  function updateAvailable() {
+    var current = ((document.querySelector(".version") || {}).textContent || "").trim();
+    return !!current && load(UPDATE_SEEN_KEY, "") !== current;
+  }
+  function markUpdateSeen() {
+    var current = ((document.querySelector(".version") || {}).textContent || "").trim();
+    if (current) save(UPDATE_SEEN_KEY, current);
+  }
 
   var $ = function (id) { return document.getElementById(id); };
 
@@ -1594,8 +1606,20 @@
     $("navPanel").hidden = !isAdmin();
     if (profile) {
       var nw = document.createElement("button");
-      nw.className = "statsbtn"; nw.textContent = "What's new";
-      nw.onclick = H(function () { show("viewNew"); });
+      nw.className = "statsbtn";
+      nw.textContent = "What's new";
+      if (updateAvailable()) {
+        var alertMark = document.createElement("span");
+        alertMark.className = "new-alert";
+        alertMark.textContent = "!";
+        alertMark.setAttribute("aria-label", "New update");
+        nw.appendChild(alertMark);
+      }
+      nw.onclick = H(function () {
+        markUpdateSeen();
+        nw.querySelector(".new-alert") && nw.querySelector(".new-alert").remove();
+        show("viewNew");
+      });
       var gm = document.createElement("button");
       gm.className = "statsbtn"; gm.textContent = "Games";
       gm.onclick = H(function () { show("viewGames"); });
