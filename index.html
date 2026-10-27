@@ -199,6 +199,8 @@
     border: 2px solid var(--brass); border-radius: 16px; padding: 24px 16px;
   }
   .gamecard:hover { background: rgba(216,169,75,.18); }
+  a.gamecard { text-decoration: none; }
+  a.gamecard:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
   .gameicon { font-size: 3rem; line-height: 1; }
   .gamename { font-family: Rockwell, "Roboto Slab", Georgia, serif; font-size: 1.5rem; font-weight: 800; color: var(--brass); }
   .gamedesc { color: var(--muted); font-size: .9rem; }
@@ -420,7 +422,7 @@
   </nav>
   <div class="hright">
     <div class="who" id="who"></div>
-    <div class="version">v1.9.2</div>
+    <div class="version">v1.9.3</div>
   </div>
 </header>
 
@@ -504,6 +506,15 @@
         <span class="gamename">Poker</span>
         <span class="gamedesc">Basically just poker.</span>
       </button>
+    </div>
+
+    <h2 class="earnhead">See my other stuff!</h2>
+    <div class="gamegrid">
+      <a class="gamecard" id="gameHub" href="https://0audacity0.github.io/Matthew-s-Project-Hub/">
+        <span class="gameicon">🌐</span>
+        <span class="gamename">Matthew's Project Hub</span>
+        <span class="gamedesc">Check out my other websites and projects.</span>
+      </a>
     </div>
 
     <h2 class="earnhead">Earn Chip's</h2>
@@ -604,11 +615,11 @@
   </section>
 
   <section id="viewNew" hidden>
-    <h1>What's new in <span id="newVer">v1.9.2</span></h1>
+    <h1>What's new in <span id="newVer">v1.9.3</span></h1>
     <p class="sub" id="newSub">"The End of The Start"</p>
     <ul class="changelog" id="changelog">
       <li>Added the disclaimer upon opening the game</li>
-      <li></li>
+      <li>Added new thing in "Games" tab</li>
       <li></li>
       <li></li>
       <li></li>
